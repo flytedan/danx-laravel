@@ -3,6 +3,7 @@
     "description": "Danx Auditing, Logging, and Helpers",
     "type": "library",
     "license": "MIT",
+    "version": "0.0.1",
     "require": {
         "php": "^8.0",
         "illuminate/support": "^11.1"
