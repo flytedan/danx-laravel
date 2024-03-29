@@ -1,9 +1,8 @@
 {
-    "name": "newms87/danx-laravel",
+    "name": "flytedan/danx-laravel",
     "description": "Danx Auditing, Logging, and Helpers",
     "type": "library",
     "license": "MIT",
-    "version": "0.0.1",
     "require": {
         "php": "^8.0",
         "illuminate/support": "^11.1"
@@ -13,13 +12,13 @@
     },
     "autoload": {
         "psr-4": {
-            "Newms87\\DanxLaravel\\": "src/"
+            "Flytedan\\DanxLaravel\\": "src/"
         }
     },
     "extra": {
         "laravel": {
             "providers": [
-                "newms87\\DanxLaravel\\DanxServiceProvider"
+                "Flytedan\\DanxLaravel\\DanxServiceProvider"
             ]
         }
     }
