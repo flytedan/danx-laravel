@@ -2,7 +2,7 @@
 
 namespace Flytedan\DanxLaravel\Api;
 
-use App\Exceptions\ApiException;
+use selfExceptions\ApiException;
 use Exception;
 use GuzzleHttp\Client;
 

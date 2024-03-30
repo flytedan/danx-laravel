@@ -2,13 +2,13 @@
 
 namespace Flytedan\DanxLaravel\Jobs;
 
+use Carbon\Carbon;
+use Exception;
 use Flytedan\DanxLaravel\Audit\AuditDriver;
 use Flytedan\DanxLaravel\Helpers\DateHelper;
 use Flytedan\DanxLaravel\Helpers\FileHelper;
 use Flytedan\DanxLaravel\Helpers\LockHelper;
-use Flytedan\DanxLaravel\Models\JobDispatch;
-use Carbon\Carbon;
-use Exception;
+use Flytedan\DanxLaravel\Models\Job\JobDispatch;
 use Illuminate\Bus\Batchable;
 use Illuminate\Bus\Dispatcher;
 use Illuminate\Bus\Queueable;
@@ -100,7 +100,7 @@ abstract class Job implements ShouldQueue
             ]);
         }
 
-        if(config('audit.enabled')) {
+        if(config('danx.audit.enabled')) {
             $jobDispatch->update(['dispatch_audit_request_id' => AuditDriver::getAuditRequest()?->id]);
         }
 
@@ -207,7 +207,7 @@ abstract class Job implements ShouldQueue
 
         $class = get_class($this);
 
-        if(config('audit.jobs.debug')) {
+        if(config('danx.audit.jobs.debug')) {
             Log::debug("Unserializing Job " . static::class . " ({$this->jobDispatch?->id})");
         }
 
@@ -234,7 +234,7 @@ abstract class Job implements ShouldQueue
             }
 
             try {
-                if(config('audit.jobs.debug')) {
+                if(config('danx.audit.jobs.debug')) {
                     Log::debug("$name: " . substr(json_encode($values[$name], JSON_PRETTY_PRINT), 0, 500));
                 }
                 // Unnecessary overhead to load all the relationships up front - let them be lazy loaded

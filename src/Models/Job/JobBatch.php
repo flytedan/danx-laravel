@@ -1,8 +1,9 @@
 <?php
 
-namespace Flytedan\DanxLaravel\Models;
+namespace Flytedan\DanxLaravel\Models\Job;
 
 use Flytedan\DanxLaravel\Jobs\Job;
+use Flytedan\DanxLaravel\Models\Ref;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Laravel\SerializableClosure\SerializableClosure;

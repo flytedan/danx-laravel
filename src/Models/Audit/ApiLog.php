@@ -81,7 +81,7 @@ class ApiLog extends Model
 	 */
 	public static function parseBody($stream)
 	{
-		$maxBodyLength = config('audit.api.max_body_length');
+		$maxBodyLength = config('danx.audit.api.max_body_length');
 
 		if($stream && method_exists($stream, 'getBody')) {
 			$body       = (string)$stream->getBody();

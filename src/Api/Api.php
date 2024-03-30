@@ -214,7 +214,7 @@ abstract class Api
 					'response' => $response,
 				];
 
-				if(config('audit.api.enabled')) {
+				if(config('danx.audit.api.enabled')) {
 					try {
 						$this->currentApiLog = ApiLog::logRequest(
 							static::class,

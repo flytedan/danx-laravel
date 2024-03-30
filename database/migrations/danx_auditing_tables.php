@@ -5,11 +5,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration {
-	/**
-	 * Run the migrations.
-	 *
-	 * @return void
-	 */
+
 	public function up()
 	{
 		Schema::create('api_logs', function (Blueprint $table) {
@@ -50,7 +46,6 @@ return new class extends Migration {
 		Schema::create('audits', function (Blueprint $table) {
 			$table->increments('id');
 			$table->unsignedInteger('audit_request_id')->index('audits_audit_request_id_foreign');
-			$table->string('user_type')->nullable();
 			$table->unsignedBigInteger('user_id')->nullable();
 			$table->string('event');
 			$table->string('auditable_type');
@@ -61,7 +56,7 @@ return new class extends Migration {
 			$table->timestamps();
 
 			$table->index(['auditable_type', 'auditable_id']);
-			$table->index(['user_id', 'user_type']);
+			$table->index(['user_id']);
 		});
 
 		Schema::create('job_batches', function (Blueprint $table) {
@@ -109,11 +104,6 @@ return new class extends Migration {
 		});
 	}
 
-	/**
-	 * Reverse the migrations.
-	 *
-	 * @return void
-	 */
 	public function down()
 	{
 		Schema::table('job_dispatch', function (Blueprint $table) {

@@ -2,7 +2,7 @@
 
 namespace Flytedan\DanxLaravel\Models\Audit;
 
-use Flytedan\DanxLaravel\Models\JobDispatch;
+use Flytedan\DanxLaravel\Models\Job\JobDispatch;
 use Flytedan\DanxLaravel\Traits\HasVirtualFields;
 use Flytedan\DanxLaravel\Traits\SerializesDates;
 use Illuminate\Database\Eloquent\Model;

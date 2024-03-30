@@ -1,6 +1,6 @@
 <?php
 
-namespace Flytedan\DanxLaravel\Models;
+namespace Flytedan\DanxLaravel\Models\Job;
 
 use Flytedan\DanxLaravel\Helpers\DateHelper;
 use Flytedan\DanxLaravel\Models\Audit\AuditRequest;

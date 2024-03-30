@@ -2,6 +2,7 @@
 
 namespace Flytedan\DanxLaravel\Helpers;
 
+use Flytedan\DanxLaravel\Library\CsvExport;
 use Flytedan\DanxLaravel\Models\File\File as FileModel;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Support\Collection;
@@ -285,25 +286,6 @@ class FileHelper
     }
 
     /**
-     * Rewrite the URL to use a CDN if enabled
-     *
-     * @param string $url
-     * @return string
-     */
-    public static function rewriteCdnUrl(string $url)
-    {
-        if (config('filesystems.cdn.enabled')) {
-            return str_replace(
-                config('filesystems.cdn.origin'),
-                config('filesystems.cdn.alias'),
-                $url
-            );
-        }
-
-        return $url;
-    }
-
-    /**
      * Recursively remove a directory
      *
      * @param $dir
@@ -324,29 +306,6 @@ class FileHelper
             }
             rmdir($dir);
         }
-    }
-
-    /**
-     * Resolve an array of class names inside a directory in the App directory / namespace
-     *
-     * @param $dir
-     * @return array
-     */
-    public static function getClassNamesInAppDir($dir = '')
-    {
-        $files = FileFacade::allFiles(app_path($dir));
-
-        $namespace = 'Flytedan\DanxLaravel\\' . ($dir ? str_replace('/', '\\', $dir) . '\\' : '');
-
-        $classes = [];
-
-        foreach ($files as $file) {
-            $relativePath = str_replace('/', '\\', $file->getRelativePath());
-
-            $classes[] = $namespace . ($relativePath ? $relativePath . '\\' : '') . $file->getFilenameWithoutExtension();
-        }
-
-        return $classes;
     }
 
     /**
