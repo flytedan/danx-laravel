@@ -72,7 +72,7 @@ class SyncJob extends Model
 			'name'     => $name,
 		]);
 
-		if(!$syncJob) {
+		if (!$syncJob) {
 			throw new Exception("Sync job not found for $name on $model->id");
 		}
 		$syncJob->run();
@@ -96,7 +96,7 @@ class SyncJob extends Model
 	 */
 	public function run()
 	{
-		if($this->callback) {
+		if ($this->callback) {
 			$callback = unserialize($this->callback);
 
 			try {
@@ -107,7 +107,7 @@ class SyncJob extends Model
 				Log::debug("Sync Job running: $this->name for $this->model ($this->id)" . ($instance ? "" : " MODEL NOT FOUND"));
 
 				// If the callback returns false, we don't want to mark the sync as successful or release the lock (this could mean the job is running asynchronously)
-				if($callback($this, $instance) === false) {
+				if ($callback($this, $instance) === false) {
 					return;
 				}
 

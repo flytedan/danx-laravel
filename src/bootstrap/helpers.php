@@ -12,22 +12,22 @@ use Illuminate\Support\Str;
  * @param Authenticatable|User|null $user
  * @return bool
  */
-if(!function_exists('can')) {
+if (!function_exists('can')) {
 	function can(array|string $permission, $requireAll = false, Authenticatable $user = null)
 	{
 		$user = $user ?? user();
 
-		if(!$user) {
+		if (!$user) {
 			return false;
 		}
 
-		if(is_string($permission)) {
+		if (is_string($permission)) {
 			$permission = Str::of($permission)->explode('|');
 		}
 
 		$can = $user->can($permission);
 
-		if($requireAll) {
+		if ($requireAll) {
 			return !$can->contains(false);
 		}
 
@@ -35,7 +35,7 @@ if(!function_exists('can')) {
 	}
 }
 
-if(!function_exists('user')) {
+if (!function_exists('user')) {
 	/**
 	 * Returns an authenticated User
 	 *
@@ -47,11 +47,11 @@ if(!function_exists('user')) {
 	}
 }
 
-if(!function_exists('array_is_numeric')) {
+if (!function_exists('array_is_numeric')) {
 	function array_is_numeric($array)
 	{
 		foreach($array as $key => $value) {
-			if(!is_int($key)) {
+			if (!is_int($key)) {
 				return false;
 			}
 		}
@@ -60,7 +60,7 @@ if(!function_exists('array_is_numeric')) {
 	}
 }
 
-if(!function_exists('app_url')) {
+if (!function_exists('app_url')) {
 	function app_url($path = '', $params = [])
 	{
 		$ug = new UrlGenerator(app('router')->getRoutes(), request());
@@ -70,7 +70,7 @@ if(!function_exists('app_url')) {
 	}
 }
 
-if(!function_exists('api_url')) {
+if (!function_exists('api_url')) {
 	function api_url($path = '', $params = [], $short = false)
 	{
 		$baseUrl = $short && config('app.short_url') ? config('app.short_url') : config('app.url');
@@ -81,14 +81,14 @@ if(!function_exists('api_url')) {
 	}
 }
 
-if(!function_exists('api_short_url')) {
+if (!function_exists('api_short_url')) {
 	function api_short_url($path = '', $params = [])
 	{
 		return api_url($path, $params, true);
 	}
 }
 
-if(!function_exists('uuid')) {
+if (!function_exists('uuid')) {
 	/**
 	 * Creates a UUID v4 string
 	 *
@@ -119,7 +119,7 @@ if(!function_exists('uuid')) {
 	}
 }
 
-if(!function_exists('carbon')) {
+if (!function_exists('carbon')) {
 	function carbon($date = null, $tz = null)
 	{
 		return Carbon\Carbon::parse($date, $tz);

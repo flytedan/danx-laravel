@@ -2,10 +2,10 @@
 
 namespace Flytedan\DanxLaravel\Models\Audit;
 
-use Flytedan\DanxLaravel\Audit\AuditDriver;
-use Flytedan\DanxLaravel\Helpers\StringHelper;
 use Error;
 use Exception;
+use Flytedan\DanxLaravel\Audit\AuditDriver;
+use Flytedan\DanxLaravel\Helpers\StringHelper;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -53,12 +53,12 @@ class ErrorLog extends Model
 	public static function logException($level, Exception|Error $exception, array $data = [], ErrorLog $parent = null)
 	{
 		// Ignore logging Warnings or lower
-		if(isset($exception::$level) && $exception::$level <= 300 || $level === 'WARNING') {
+		if (isset($exception::$level) && $exception::$level <= 300 || $level === 'WARNING') {
 			return null;
 		}
 
 		// Override the exception logging level if it is set
-		if(isset($exception::$level)) {
+		if (isset($exception::$level)) {
 			$level = self::getLevelName($exception::$level);
 		}
 
@@ -78,7 +78,7 @@ class ErrorLog extends Model
 		]);
 
 		// Attach the parent entry if one exists
-		if($parent) {
+		if ($parent) {
 			$errorLog->parent()->associate($parent);
 			$errorLog->root()->associate($parent->root_id ?: $parent);
 		}
@@ -86,7 +86,7 @@ class ErrorLog extends Model
 		$errorLog = self::log($errorLog, $message, $data);
 
 		// If this is a new error log entry, lets map out the children
-		if($exception->getPrevious()) {
+		if ($exception->getPrevious()) {
 			self::logException($level, $exception->getPrevious(), [], $errorLog);
 		}
 
@@ -140,7 +140,7 @@ class ErrorLog extends Model
 	public static function logErrorMessage($level, $message, $code = 0, array $data = [])
 	{
 		// Ignore logging Warnings
-		if($level === 'WARNING') {
+		if ($level === 'WARNING') {
 			return null;
 		}
 
@@ -176,7 +176,7 @@ class ErrorLog extends Model
 			return null;
 		}
 
-		if($existingErrorLog) {
+		if ($existingErrorLog) {
 			$errorLog = $existingErrorLog;
 			$errorLog->count++;
 		} else {
@@ -222,7 +222,7 @@ class ErrorLog extends Model
 	 */
 	public function generateHash()
 	{
-		if($this->stack_trace) {
+		if ($this->stack_trace) {
 			$id = json_encode($this->stack_trace);
 		} else {
 			$id = explode(':', $this->message)[0];

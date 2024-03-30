@@ -20,7 +20,7 @@ class ArrayHelper
 		$result = [];
 
 		foreach($array as $key => $value) {
-			if(is_array($value)) {
+			if (is_array($value)) {
 				$result = array_merge($result, self::flatMapAssoc($value, $prefix . $key . '.'));
 			} else {
 				$result[$prefix . $key] = $value;
@@ -41,7 +41,7 @@ class ArrayHelper
 		$array1 = self::flatMapAssoc($array1);
 		$array2 = self::flatMapAssoc($array2);
 
-		if($ignoreMissingKeys) {
+		if ($ignoreMissingKeys) {
 			$array1 = array_intersect_key($array1, $array2);
 			$array2 = array_intersect_key($array2, $array1);
 		}

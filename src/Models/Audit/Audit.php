@@ -11,45 +11,45 @@ use OwenIt\Auditing\Contracts\Audit as AuditContract;
 
 class Audit extends Model implements AuditContract
 {
-    use AuditModel, SerializesDates;
+	use AuditModel, SerializesDates;
 
-    protected $table = 'audits';
+	protected $table = 'audits';
 
-    /**
-     * {@inheritdoc}
-     */
-    protected $guarded = [];
+	/**
+	 * {@inheritdoc}
+	 */
+	protected $guarded = [];
 
-    /**
-     * {@inheritdoc}
-     */
-    protected $casts = [
-        'old_values' => 'json',
-        'new_values' => 'json',
-    ];
+	/**
+	 * {@inheritdoc}
+	 */
+	protected $casts = [
+		'old_values' => 'json',
+		'new_values' => 'json',
+	];
 
-    /**
-     * @return MorphTo|mixed
-     */
-    public function auditable()
-    {
-        return $this->morphTo();
-    }
+	/**
+	 * @return MorphTo|mixed
+	 */
+	public function auditable()
+	{
+		return $this->morphTo();
+	}
 
-    /**
-     * @return BelongsTo|AuditRequest
-     */
-    public function auditRequest()
-    {
-        return $this->belongsTo(AuditRequest::class);
-    }
+	/**
+	 * @return BelongsTo|AuditRequest
+	 */
+	public function auditRequest()
+	{
+		return $this->belongsTo(AuditRequest::class);
+	}
 
-    /**
-     * @return BelongsTo|User
-     */
-    public function user()
-    {
-        return $this->belongsTo(User::class)
-            ->withTrashed();
-    }
+	/**
+	 * @return BelongsTo|User
+	 */
+	public function user()
+	{
+		return $this->belongsTo(User::class)
+			->withTrashed();
+	}
 }

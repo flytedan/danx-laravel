@@ -12,67 +12,69 @@ use Symfony\Component\Console\Attribute\AsCommand;
 #[AsCommand(name: 'vapor:encrypt')]
 class VaporEncryptCommand extends Command
 {
-    protected $signature = 'vapor:encrypt {env}';
-    protected static $defaultName = 'vapor:encrypt';
-    protected $description = 'Encrypt an environment file for use w/ deployed laravel vapor environments';
+	protected        $signature   = 'vapor:encrypt {env}';
+	protected static $defaultName = 'vapor:encrypt';
+	protected        $description = 'Encrypt an environment file for use w/ deployed laravel vapor environments';
 
-    protected Filesystem $files;
+	protected Filesystem $files;
 
-    public function __construct(Filesystem $files)
-    {
-        parent::__construct();
-        $this->files = $files;
-    }
+	public function __construct(Filesystem $files)
+	{
+		parent::__construct();
+		$this->files = $files;
+	}
 
-    public function handle()
-    {
-        $cipher = 'AES-256-CBC';
-        $key    = $this->parseKey(config('app.encryption_key'));
-        $env    = $this->argument('env');
+	public function handle()
+	{
+		$cipher = 'AES-256-CBC';
+		$key    = $this->parseKey(config('app.encryption_key'));
+		$env    = $this->argument('env');
 
-        $environmentFile = base_path('.env') . '.' . $env;
-        $encryptedFile   = $environmentFile . '.encrypted';
+		$environmentFile = base_path('.env') . '.' . $env;
+		$encryptedFile   = $environmentFile . '.encrypted';
 
-        if (!$this->files->exists($environmentFile)) {
-            $this->components->error('Environment file not found.');
-            return Command::FAILURE;
-        }
+		if (!$this->files->exists($environmentFile)) {
+			$this->components->error('Environment file not found.');
 
-        try {
-            $encrypter = new Encrypter($key, $cipher);
+			return Command::FAILURE;
+		}
 
-            $this->files->put(
-                $encryptedFile,
-                $encrypter->encrypt($this->files->get($environmentFile))
-            );
-        } catch (Exception $e) {
-            $this->components->error($e->getMessage());
-            return Command::FAILURE;
-        }
+		try {
+			$encrypter = new Encrypter($key, $cipher);
 
-        $this->components->info('Environment successfully encrypted.');
+			$this->files->put(
+				$encryptedFile,
+				$encrypter->encrypt($this->files->get($environmentFile))
+			);
+		} catch(Exception $e) {
+			$this->components->error($e->getMessage());
 
-        $this->components->twoColumnDetail('Key', 'base64:' . base64_encode($key));
-        $this->components->twoColumnDetail('Cipher', $cipher);
-        $this->components->twoColumnDetail('Encrypted file', $encryptedFile);
+			return Command::FAILURE;
+		}
 
-        $this->newLine();
+		$this->components->info('Environment successfully encrypted.');
 
-        return Command::SUCCESS;
-    }
+		$this->components->twoColumnDetail('Key', 'base64:' . base64_encode($key));
+		$this->components->twoColumnDetail('Cipher', $cipher);
+		$this->components->twoColumnDetail('Encrypted file', $encryptedFile);
 
-    /**
-     * Parse the encryption key.
-     *
-     * @param string $key
-     * @return string
-     */
-    protected function parseKey(string $key)
-    {
-        if (Str::startsWith($key, $prefix = 'base64:')) {
-            $key = base64_decode(Str::after($key, $prefix));
-        }
+		$this->newLine();
 
-        return $key;
-    }
+		return Command::SUCCESS;
+	}
+
+	/**
+	 * Parse the encryption key.
+	 *
+	 * @param string $key
+	 * @return string
+	 */
+	protected function parseKey(string $key)
+	{
+		if (Str::startsWith($key, $prefix = 'base64:')) {
+			$key = base64_decode(Str::after($key, $prefix));
+		}
+
+		return $key;
+	}
 }

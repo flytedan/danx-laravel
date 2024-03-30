@@ -161,7 +161,7 @@ abstract class Api
 	 */
 	public function throttle()
 	{
-		if(static::THROTTLE_ATTEMPTS) {
+		if (static::THROTTLE_ATTEMPTS) {
 			$waitPerAttempt = static::THROTTLE_DECAY_SECONDS * 1000 / static::THROTTLE_ATTEMPTS;
 
 			$key = $this->getServiceName();
@@ -182,7 +182,7 @@ abstract class Api
 	 */
 	public function client($options = [])
 	{
-		if(!$this->client) {
+		if (!$this->client) {
 			$options['handler'] = $this->createHandler();
 
 			$options['headers'] = ($options['headers'] ?? []) + [
@@ -214,7 +214,7 @@ abstract class Api
 					'response' => $response,
 				];
 
-				if(config('danx.audit.api.enabled')) {
+				if (config('danx.audit.api.enabled')) {
 					try {
 						$this->currentApiLog = ApiLog::logRequest(
 							static::class,
@@ -272,12 +272,12 @@ abstract class Api
 	 */
 	protected function fireCallbacks(ApiLog $apiLog)
 	{
-		if(method_exists($this, 'afterLog')) {
+		if (method_exists($this, 'afterLog')) {
 			$this->afterLog($apiLog);
 		}
 
-		if($apiLog->method === self::METHOD_GET) {
-			if($this->onGetCallbacks) {
+		if ($apiLog->method === self::METHOD_GET) {
+			if ($this->onGetCallbacks) {
 				foreach($this->onGetCallbacks as $callback) {
 					try {
 						$callback($apiLog);
@@ -290,7 +290,7 @@ abstract class Api
 				}
 			}
 		} else {
-			if($this->onUpdateCallbacks) {
+			if ($this->onUpdateCallbacks) {
 				foreach($this->onUpdateCallbacks as $callback) {
 					try {
 						$callback($apiLog);
@@ -313,7 +313,7 @@ abstract class Api
 	 */
 	public static function getRequestLog(bool $formatted = true)
 	{
-		if($formatted) {
+		if ($formatted) {
 			$entries = collect([]);
 
 			foreach(self::$requestLog as $entry) {
@@ -357,7 +357,7 @@ abstract class Api
 		$requestBody = (string)$request->getBody();
 		$headers     = self::displayHeaders($request->getHeaders());
 
-		if($response) {
+		if ($response) {
 			$statusCode = $response->getStatusCode();
 
 			$responseBody = (string)$response->getBody();
@@ -444,7 +444,7 @@ abstract class Api
 
 		try {
 			// Enable request debugging
-			if($this->debug) {
+			if ($this->debug) {
 				$options['debug'] = true;
 			}
 
@@ -502,7 +502,7 @@ abstract class Api
 	{
 		$jsonBody = StringHelper::safeJsonEncode($data);
 
-		if($data && !$jsonBody) {
+		if ($data && !$jsonBody) {
 			throw new ApiException("Failed to encode data to JSON\n\n" . serialize($data));
 		}
 
@@ -549,13 +549,13 @@ abstract class Api
 	 */
 	public function json($assoc = true)
 	{
-		if(!$this->response) {
+		if (!$this->response) {
 			return null;
 		}
 
 		$this->rawContent = $this->response->getBody()->getContents();
 
-		if(!$this->rawContent) {
+		if (!$this->rawContent) {
 			return null;
 		}
 

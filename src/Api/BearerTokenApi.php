@@ -10,36 +10,36 @@ use GuzzleHttp\Client;
  */
 abstract class BearerTokenApi extends Api
 {
-    protected ?string $token = null;
+	protected ?string $token = null;
 
-    /**
-     * @param array $options
-     * @return Client
-     *
-     * @throws Exception
-     */
-    public function client($options = [])
-    {
-        if (!$this->token) {
-            throw new Exception('API Token should be configured in child classes constructor');
-        }
+	/**
+	 * @param array $options
+	 * @return Client
+	 *
+	 * @throws Exception
+	 */
+	public function client($options = [])
+	{
+		if (!$this->token) {
+			throw new Exception('API Token should be configured in child classes constructor');
+		}
 
-        // Merge the auth headers with any existing headers on the options
-        $options['headers'] = ($options['headers'] ?? []) + $this->getHeaders();
+		// Merge the auth headers with any existing headers on the options
+		$options['headers'] = ($options['headers'] ?? []) + $this->getHeaders();
 
-        return parent::client($options);
-    }
+		return parent::client($options);
+	}
 
-    /**
-     * Returns the Bearer Token headers
-     *
-     * @return string[]
-     * @throws Exception
-     */
-    public function getHeaders()
-    {
-        return [
-            'Authorization' => 'Bearer ' . $this->token,
-        ];
-    }
+	/**
+	 * Returns the Bearer Token headers
+	 *
+	 * @return string[]
+	 * @throws Exception
+	 */
+	public function getHeaders()
+	{
+		return [
+			'Authorization' => 'Bearer ' . $this->token,
+		];
+	}
 }

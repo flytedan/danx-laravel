@@ -18,12 +18,12 @@ class ResponseSizeLimitMiddleware
 
 		// AWS ALB Lambda responses have a hard 6MB limit on payload size (including headers / requests / responses)
 		// If this limit is reached, we will send a message to slack to inform us of an issue.
-		if(config('danx.response_size_limit.enabled')) {
+		if (config('danx.response_size_limit.enabled')) {
 			$content = method_exists($response, 'content') ? $response->content() : $response->getContent();
 
 			$payloadSize = strlen($content) ?? 0;
 
-			if($payloadSize > config('danx.response_size_limit.limit')) {
+			if ($payloadSize > config('danx.response_size_limit.limit')) {
 				return static::convertResponseToFile($content, $payloadSize, $response);
 			}
 		}
@@ -46,7 +46,7 @@ class ResponseSizeLimitMiddleware
 	{
 		$auditRequest = AuditDriver::getAuditRequest();
 
-		if($auditRequest) {
+		if ($auditRequest) {
 			$url    = app_url('nova/resources/audit-requests/' . $auditRequest->id);
 			$arLink = "<$url|Request $auditRequest->id ($payloadSize Bytes)>";
 		} else {
@@ -75,7 +75,7 @@ class ResponseSizeLimitMiddleware
 		$origin = config('danx.response_size_limit.cdn_origin');
 		$alias  = config('danx.response_size_limit.cdn_alias');
 
-		if($alias) {
+		if ($alias) {
 			return str_replace(
 				$origin,
 				$alias,

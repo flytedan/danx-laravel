@@ -20,7 +20,7 @@ trait UuidModelTrait
 		static::creating(function (Model $model) {
 			/** @var UuidModelTrait $model */
 			// Only generate UUID if it wasn't set by already.
-			if(!isset($model->attributes[$model->getKeyName()])) {
+			if (!isset($model->attributes[$model->getKeyName()])) {
 				// This is necessary because on \Illuminate\Database\Eloquent\Model::performInsert
 				// will not check for $this->getIncrementing() but directly for $this->incrementing
 				$model->incrementing = false;

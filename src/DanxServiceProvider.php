@@ -22,7 +22,7 @@ class DanxServiceProvider extends ServiceProvider
 			__DIR__ . '/../database/migrations' => database_path('migrations'),
 		]);
 
-		if($this->app->runningInConsole()) {
+		if ($this->app->runningInConsole()) {
 			$this->commands([
 				SyncDirtyJobsCommand::class,
 				VaporDecryptCommand::class,

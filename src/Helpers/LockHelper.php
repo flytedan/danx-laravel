@@ -38,7 +38,7 @@ class LockHelper
 			$firstLock = $lock->get();
 
 			// If we did not get the lock on the first attempt, block until we get the lock
-			if(!$firstLock) {
+			if (!$firstLock) {
 				Log::debug("##### LOCK WAIT: $key");
 				$lock->block($waitTime);
 				Log::debug("##### LOCK ACQUIRED: $key");
@@ -78,7 +78,7 @@ class LockHelper
 	 */
 	public static function resolveKey($key)
 	{
-		if($key instanceof Model) {
+		if ($key instanceof Model) {
 			return $key::class . ':' . $key->getKey();
 		} else {
 			return $key;

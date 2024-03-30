@@ -39,7 +39,7 @@ trait ConsoleStreamable
 	];
 
 	protected ?OutputStyle $consoleOutput = null;
-	protected ?ArgvInput $consoleInput = null;
+	protected ?ArgvInput   $consoleInput  = null;
 
 	/**
 	 * @return OutputStyle
@@ -81,7 +81,7 @@ trait ConsoleStreamable
 			]
 		);
 
-		foreach (self::OUTPUT_STYLE as $style => $colors) {
+		foreach(self::OUTPUT_STYLE as $style => $colors) {
 			$formatter = new OutputFormatterStyle(...$colors);
 
 			$this->consoleOutput->getFormatter()->setStyle($style, $formatter);
@@ -198,7 +198,8 @@ trait ConsoleStreamable
 		$string,
 		$style = self::OUTPUT_INFO,
 		$verbosity = OutputInterface::VERBOSITY_DEBUG
-	) {
+	)
+	{
 		$styled = $style ? "<$style>$string</$style>" : $string;
 
 		$this->consoleOutput()->writeln($styled, $verbosity);
@@ -312,7 +313,7 @@ trait ConsoleStreamable
 
 		$table->setHeaders((array)$headers)->setRows($rows)->setStyle($tableStyle);
 
-		foreach ($columnStyles as $columnIndex => $columnStyle) {
+		foreach($columnStyles as $columnIndex => $columnStyle) {
 			$table->setColumnStyle($columnIndex, $columnStyle);
 		}
 

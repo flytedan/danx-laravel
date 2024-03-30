@@ -102,7 +102,7 @@ class AuditDriver implements AuditDriverContract
 	 */
 	public static function getAuditRequestOrIgnore()
 	{
-		if(!self::$auditRequest && app()->runningInConsole()) {
+		if (!self::$auditRequest && app()->runningInConsole()) {
 			return null;
 		}
 
@@ -172,7 +172,7 @@ class AuditDriver implements AuditDriverContract
 	public static function createEntry($event, $data, Model|Auditable $model = null): ?Audit
 	{
 		// If auditing is disabled, do nothing
-		if(!config('audit.enabled')) {
+		if (!config('audit.enabled')) {
 			return null;
 		}
 
@@ -181,7 +181,7 @@ class AuditDriver implements AuditDriverContract
 		$auditRequest = self::getAuditRequest();
 
 		// If the AuditRequest does not exist, then we cannot create a record
-		if(!$auditRequest) {
+		if (!$auditRequest) {
 			return null;
 		}
 
@@ -189,7 +189,7 @@ class AuditDriver implements AuditDriverContract
 
 		try {
 			// Nothing to record for the updated event
-			if($event === 'updated' && empty($cleanData->old_values) && empty($cleanData->new_values)) {
+			if ($event === 'updated' && empty($cleanData->old_values) && empty($cleanData->new_values)) {
 				return null;
 			}
 
@@ -223,11 +223,11 @@ class AuditDriver implements AuditDriverContract
 		static $retry = 1;
 
 		// If auditing is disabled, do nothing
-		if(!config('audit.enabled')) {
+		if (!config('audit.enabled')) {
 			return null;
 		}
 
-		if(!self::$auditRequest) {
+		if (!self::$auditRequest) {
 			try {
 				self::$auditRequest = AuditRequest::create([
 					'session_id'  => self::getSessionUuid(),
@@ -238,7 +238,7 @@ class AuditDriver implements AuditDriverContract
 					'time'        => 0,
 				]);
 			} catch(Exception $e) {
-				if($retry--) {
+				if ($retry--) {
 					Log::debug("Failed to create audit request. Auditing has been disabled.\n\n" . $e->getMessage());
 					config()->set('audit.enabled', false);
 				}
@@ -262,15 +262,15 @@ class AuditDriver implements AuditDriverContract
 		// Check if there is a UUID specific for this User Agent (ie: kube-probe, or specific crawlers) to avoid creating a new session every time
 		$uuid = @self::IGNORE_USER_AGENTS[$userAgent];
 
-		if(!$uuid) {
+		if (!$uuid) {
 			$request = request();
 
 			$uuid = $request->header(self::SESSION_HEADER);
 
-			if(!$uuid || strlen($uuid) !== 36) {
+			if (!$uuid || strlen($uuid) !== 36) {
 				$uuid = $request->cookie(self::SESSION_COOKIE);
 
-				if(!$uuid) {
+				if (!$uuid) {
 					$uuid = @$_COOKIE[self::SESSION_COOKIE];
 				}
 			}
@@ -348,7 +348,7 @@ class AuditDriver implements AuditDriverContract
 	{
 		foreach($data as $key => &$value) {
 			foreach(self::SENSITIVE_FIELDS as $regex) {
-				if(preg_match($regex, $key)) {
+				if (preg_match($regex, $key)) {
 					$value = '*****';
 				}
 			}
@@ -369,18 +369,18 @@ class AuditDriver implements AuditDriverContract
 		$newValues = [];
 
 		foreach($data->new_values as $key => $newValue) {
-			if(is_array($data->old_values) && array_key_exists($key, $data->old_values)) {
+			if (is_array($data->old_values) && array_key_exists($key, $data->old_values)) {
 				$oldValue = $data->old_values[$key];
 
 				// Attempt to cast the new value to the same type as the old value
-				if(gettype($newValue) !== gettype($oldValue)) {
-					if(is_string($oldValue)) {
+				if (gettype($newValue) !== gettype($oldValue)) {
+					if (is_string($oldValue)) {
 						$newValue = (string)$newValue;
-					} elseif(is_integer($oldValue)) {
+					} elseif (is_integer($oldValue)) {
 						$newValue = (int)$newValue;
-					} elseif(is_float($oldValue)) {
+					} elseif (is_float($oldValue)) {
 						$newValue = (float)$newValue;
-					} elseif(is_bool($oldValue)) {
+					} elseif (is_bool($oldValue)) {
 						$newValue = (bool)$newValue;
 					}
 				}
@@ -389,21 +389,21 @@ class AuditDriver implements AuditDriverContract
 				//       In this case, only compare as numbers if they both are numeric.
 				//       Technically this is ambiguous: "1.00" == "1" is different in a numeric context, but in a string context they are different
 				//       Weather it makes sense to record this change depends, but most cases probably better to ignore
-				if(is_numeric($oldValue) && is_numeric($newValue)) {
-					if($oldValue == $newValue) {
+				if (is_numeric($oldValue) && is_numeric($newValue)) {
+					if ($oldValue == $newValue) {
 						continue;
 					} else {
 						// In the case it is numeric and has decimal places. We want to make sure we're comparing the correct number of decimal places
 						$tableName = $model?->getTable();
-						if($tableName) {
+						if ($tableName) {
 							$decimalPlaces = cache()->rememberForever($tableName . '.' . $key,
 								fn() => $model?->getConnection()->getDoctrineColumn($tableName, $key)->getScale());
 
-							if($decimalPlaces) {
+							if ($decimalPlaces) {
 								$oldValue = round($oldValue, $decimalPlaces);
 								$newValue = round($newValue, $decimalPlaces);
 
-								if($oldValue === $newValue) {
+								if ($oldValue === $newValue) {
 									continue;
 								}
 							}
@@ -412,7 +412,7 @@ class AuditDriver implements AuditDriverContract
 				}
 
 				// Sanity check to make sure we are only recording changed values
-				if($oldValue === $newValue) {
+				if ($oldValue === $newValue) {
 					continue;
 				}
 
@@ -442,14 +442,14 @@ class AuditDriver implements AuditDriverContract
 	 */
 	public function prune(Auditable $model): bool
 	{
-		if(($threshold = $model->getAuditThreshold()) > 0) {
+		if (($threshold = $model->getAuditThreshold()) > 0) {
 			$forRemoval = $model->audits()
 				->latest()
 				->get()
 				->slice($threshold)
 				->pluck('id');
 
-			if(!$forRemoval->isEmpty()) {
+			if (!$forRemoval->isEmpty()) {
 				return $model->audits()
 						->whereIn('id', $forRemoval)
 						->delete() > 0;

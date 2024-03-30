@@ -6,5 +6,5 @@ use Flytedan\DanxLaravel\Traits\ConsoleStreamable;
 
 class ConsoleHelper
 {
-    use ConsoleStreamable;
+	use ConsoleStreamable;
 }

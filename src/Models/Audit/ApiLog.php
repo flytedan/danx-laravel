@@ -2,9 +2,9 @@
 
 namespace Flytedan\DanxLaravel\Models\Audit;
 
+use Exception;
 use Flytedan\DanxLaravel\Audit\AuditDriver;
 use Flytedan\DanxLaravel\Helpers\StringHelper;
-use Exception;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -83,17 +83,17 @@ class ApiLog extends Model
 	{
 		$maxBodyLength = config('danx.audit.api.max_body_length');
 
-		if($stream && method_exists($stream, 'getBody')) {
+		if ($stream && method_exists($stream, 'getBody')) {
 			$body       = (string)$stream->getBody();
 			$bodyLength = strlen($body);
 
-			if($bodyLength === 0) {
+			if ($bodyLength === 0) {
 				return null;
 			}
 
 			$bodyPreview = StringHelper::safeConvertToUTF8(substr($body, 0, $maxBodyLength));
 
-			if($bodyLength > $maxBodyLength) {
+			if ($bodyLength > $maxBodyLength) {
 				return [
 					'message' => 'Body is too long',
 					'length'  => $bodyLength,
