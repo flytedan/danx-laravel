@@ -6,12 +6,13 @@ use Illuminate\Contracts\Auth\StatefulGuard;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Config;
 
 function app(): App { }
 
 function auth($guard = null): Factory|Guard|StatefulGuard { }
 
-function config($path = ''): array|string|int|bool|float { }
+function config($path = ''): array|string|int|bool|float|Config { }
 
 function request(): Request { }
 

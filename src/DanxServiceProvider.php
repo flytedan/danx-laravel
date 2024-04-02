@@ -10,6 +10,8 @@ use Illuminate\Console\Events\CommandStarting;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
 
+require_once __DIR__ . '/../bootstrap/helpers.php';
+
 class DanxServiceProvider extends ServiceProvider
 {
 	public function boot()
