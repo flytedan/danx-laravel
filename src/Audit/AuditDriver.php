@@ -172,7 +172,7 @@ class AuditDriver implements AuditDriverContract
 	public static function createEntry($event, $data, Model|Auditable $model = null): ?Audit
 	{
 		// If auditing is disabled, do nothing
-		if (!config('audit.enabled')) {
+		if (!config('danx.audit.enabled')) {
 			return null;
 		}
 
@@ -204,7 +204,9 @@ class AuditDriver implements AuditDriverContract
 				'tags'             => $data->tags,
 			]);
 		} catch(Exception $e) {
-			Log::debug('Failed to create audit entry: ' . $e->getMessage());
+			if (config('danx.audit.debug')) {
+				Log::debug("Failed to create audit entry: " . $e->getMessage());
+			}
 
 			return null;
 		}
@@ -223,7 +225,7 @@ class AuditDriver implements AuditDriverContract
 		static $retry = 1;
 
 		// If auditing is disabled, do nothing
-		if (!config('audit.enabled')) {
+		if (!config('danx.audit.enabled')) {
 			return null;
 		}
 
@@ -239,8 +241,10 @@ class AuditDriver implements AuditDriverContract
 				]);
 			} catch(Exception $e) {
 				if ($retry--) {
-					Log::debug("Failed to create audit request. Auditing has been disabled.\n\n" . $e->getMessage());
-					config()->set('audit.enabled', false);
+					if (config('danx.audit.debug')) {
+						Log::debug("Failed to create audit request. Auditing has been disabled.\n\n" . $e->getMessage());
+					}
+					config()->set('danx.audit.enabled', false);
 				}
 
 				return null;

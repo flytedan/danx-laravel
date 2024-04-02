@@ -2,7 +2,12 @@
 
 return [
 	'audit'               => [
-		'enabled' => env('AUDITING_ENABLED', false),
+		'enabled' => env('AUDIT_ENABLED', env('AUDITING_ENABLED', false)),
+
+		/**
+		 * Enables debugging for the audit log (normally only enabled when trying to figure out what went wrong w/ auditing)
+		 */
+		'debug'   => env('AUDIT_DEBUG', false),
 
 		/**
 		 * Enable auditing / logging for any Api implementations using the Api class
