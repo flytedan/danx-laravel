@@ -2,6 +2,7 @@
 
 namespace Flytedan\DanxLaravel;
 
+use Flytedan\DanxLaravel\Console\Commands\FixPermissions;
 use Flytedan\DanxLaravel\Console\Commands\SyncDirtyJobsCommand;
 use Flytedan\DanxLaravel\Console\Commands\VaporDecryptCommand;
 use Flytedan\DanxLaravel\Console\Commands\VaporEncryptCommand;
@@ -22,14 +23,16 @@ class DanxServiceProvider extends ServiceProvider
 
 		$this->publishesMigrations([
 			__DIR__ . '/../database/migrations' => database_path('migrations'),
+			__DIR__ . '/../config/danx.php'     => config_path('danx.php'),
 		]);
 
 		$this->publishes([
-			__DIR__ . '/../.tinkerwell/CustomAuditDriver.php' => base_path('..tinkerwell/CustomAuditDriver.php'),
+			__DIR__ . '/../.tinkerwell/CustomAuditDriver.php' => base_path('.tinkerwell/CustomAuditDriver.php'),
 		]);
 
 		if ($this->app->runningInConsole()) {
 			$this->commands([
+				FixPermissions::class,
 				SyncDirtyJobsCommand::class,
 				VaporDecryptCommand::class,
 				VaporEncryptCommand::class,

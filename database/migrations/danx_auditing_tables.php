@@ -59,6 +59,42 @@ return new class extends Migration {
 			$table->index(['user_id']);
 		});
 
+
+		Schema::create('error_log_entry', function (Blueprint $table) {
+			$table->bigIncrements('id');
+			$table->unsignedBigInteger('error_log_id')->index('error_log_entry_error_log_id_foreign');
+			$table->unsignedInteger('audit_request_id')->nullable()->index('error_log_entry_audit_request_id_foreign');
+			$table->unsignedInteger('user_id')->nullable();
+			$table->string('message', 512)->default('');
+			$table->longText('full_message')->nullable();
+			$table->json('data')->nullable();
+			$table->timestamp('created_at')->nullable()->index();
+			$table->timestamp('updated_at')->nullable();
+
+			$table->index(['user_id', 'created_at']);
+		});
+
+		Schema::create('error_logs', function (Blueprint $table) {
+			$table->bigIncrements('id');
+			$table->unsignedBigInteger('root_id')->nullable()->index('error_logs_root_id_foreign');
+			$table->unsignedBigInteger('parent_id')->nullable()->index('error_logs_parent_id_foreign');
+			$table->string('hash')->unique();
+			$table->string('error_class')->index();
+			$table->string('code');
+			$table->string('level');
+			$table->string('message', 512)->index();
+			$table->string('file', 512)->nullable();
+			$table->unsignedInteger('line')->nullable();
+			$table->unsignedInteger('count');
+			$table->dateTime('last_seen_at');
+			$table->dateTime('last_notified_at')->nullable();
+			$table->boolean('send_notifications')->default(true);
+			$table->json('stack_trace')->nullable();
+			$table->timestamps();
+
+			$table->index(['level', 'code', 'error_class']);
+		});
+
 		Schema::create('job_batches', function (Blueprint $table) {
 			$table->string('id')->primary();
 			$table->string('name');
@@ -98,6 +134,16 @@ return new class extends Migration {
 			$table->foreign(['audit_request_id'])->references(['id'])->on('audit_request')->onUpdate('no action')->onDelete('no action');
 		});
 
+		Schema::table('error_log_entry', function (Blueprint $table) {
+			$table->foreign(['audit_request_id'])->references(['id'])->on('audit_request')->onUpdate('no action')->onDelete('no action');
+			$table->foreign(['error_log_id'])->references(['id'])->on('error_logs')->onUpdate('no action')->onDelete('no action');
+		});
+
+		Schema::table('error_logs', function (Blueprint $table) {
+			$table->foreign(['parent_id'])->references(['id'])->on('error_logs')->onUpdate('no action')->onDelete('no action');
+			$table->foreign(['root_id'])->references(['id'])->on('error_logs')->onUpdate('no action')->onDelete('no action');
+		});
+
 		Schema::table('job_dispatch', function (Blueprint $table) {
 			$table->foreign(['job_batch_id'])->references(['id'])->on('job_batches')->onUpdate('no action')->onDelete('no action');
 			$table->foreign(['user_id'])->references(['id'])->on('users')->onUpdate('no action')->onDelete('no action');
@@ -109,6 +155,16 @@ return new class extends Migration {
 		Schema::table('job_dispatch', function (Blueprint $table) {
 			$table->dropForeign('job_dispatch_job_batch_id_foreign');
 			$table->dropForeign('job_dispatch_user_id_foreign');
+		});
+
+		Schema::table('error_logs', function (Blueprint $table) {
+			$table->dropForeign('error_logs_parent_id_foreign');
+			$table->dropForeign('error_logs_root_id_foreign');
+		});
+
+		Schema::table('error_log_entry', function (Blueprint $table) {
+			$table->dropForeign('error_log_entry_audit_request_id_foreign');
+			$table->dropForeign('error_log_entry_error_log_id_foreign');
 		});
 
 		Schema::table('audits', function (Blueprint $table) {
@@ -123,6 +179,10 @@ return new class extends Migration {
 
 		Schema::dropIfExists('job_batches');
 
+		Schema::dropIfExists('error_logs');
+
+		Schema::dropIfExists('error_log_entry');
+		
 		Schema::dropIfExists('audits');
 
 		Schema::dropIfExists('audit_request');
