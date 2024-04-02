@@ -22,7 +22,8 @@
     "monolog/monolog": "^3.5"
   },
   "require-dev": {
-    "phpunit/phpunit": "^9.3"
+    "phpunit/phpunit": "^9.3",
+    "beyondcode/tinkerwell": "dev-main"
   },
   "autoload": {
     "psr-4": {

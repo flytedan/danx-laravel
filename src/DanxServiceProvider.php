@@ -22,6 +22,10 @@ class DanxServiceProvider extends ServiceProvider
 			__DIR__ . '/../database/migrations' => database_path('migrations'),
 		]);
 
+		$this->publishes([
+			__DIR__ . '/../.tinkerwell/CustomAuditDriver.php' => base_path('..tinkerwell/CustomAuditDriver.php'),
+		]);
+
 		if ($this->app->runningInConsole()) {
 			$this->commands([
 				SyncDirtyJobsCommand::class,
