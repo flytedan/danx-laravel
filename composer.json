@@ -18,7 +18,8 @@
     "illuminate/support": "^11.1",
     "nesbot/carbon": "^3.2",
     "owen-it/laravel-auditing": "^13.6",
-    "symfony/yaml": "^7.0"
+    "symfony/yaml": "^7.0",
+    "monolog/monolog": "^3.5"
   },
   "require-dev": {
     "phpunit/phpunit": "^9.3"
