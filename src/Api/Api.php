@@ -28,10 +28,10 @@ abstract class Api
 	/** @var false Define the attempts per time period this API should be limited to.
 	 *             (eg: THROTTLE_ATTEMPTS = 5, THROTTLE_DECAY_SECONDS = 1 --- equals 5 requests per second)
 	 */
-	const THROTTLE_ATTEMPTS      = false;
-	const THROTTLE_DECAY_SECONDS = 1;
+	const bool|int THROTTLE_ATTEMPTS      = false;
+	const int      THROTTLE_DECAY_SECONDS = 1;
 
-	const
+	const string
 		METHOD_DELETE = 'DELETE',
 		METHOD_GET = 'GET',
 		METHOD_OPTIONS = 'OPTIONS',
@@ -39,7 +39,7 @@ abstract class Api
 		METHOD_POST = 'POST',
 		METHOD_PUT = 'PUT';
 
-	const METHODS = [
+	const array METHODS = [
 		self::METHOD_DELETE  => self::METHOD_DELETE,
 		self::METHOD_GET     => self::METHOD_GET,
 		self::METHOD_OPTIONS => self::METHOD_OPTIONS,
@@ -52,18 +52,21 @@ abstract class Api
 	public static string $serviceName;
 
 	/** @var array An ordered list of requests made to API endpoints */
-	public static $requestLog = [];
+	public static array $requestLog = [];
 
 	/** @var bool Enable request debug output via stream */
-	protected $debug = false;
+	protected bool $debug = false;
 
 	//The URL Query params to send with the request
-	protected $queryParams = [];
+	protected array $queryParams = [];
 
 	/** @var ResponseInterface */
 	protected $response;
 
 	protected string $rawContent = '';
+
+	/** @var string The base URL to use for all API calls */
+	protected string $baseApiUrl = '';
 
 	/** @var string The prefix URI to use for all API requests */
 	protected string $prefixUri;
@@ -72,10 +75,10 @@ abstract class Api
 	protected ?ApiLog $currentApiLog = null;
 
 	/** @var array Registered callbacks for each GET request */
-	protected $onGetCallbacks = [];
+	protected array $onGetCallbacks = [];
 
 	/** @var array Registered callbacks for each request that makes a modification (ie: POST, PUT, PATCH, DELETE) */
-	protected $onUpdateCallbacks = [];
+	protected array $onUpdateCallbacks = [];
 
 	/**
 	 * Do Not call directly, use client() method instead
@@ -118,12 +121,16 @@ abstract class Api
 
 	/**
 	 * Returns the base URL for all API requests
-	 * @return mixed
+	 * @return string
 	 * @throws Exception
 	 */
-	public function getBaseApiUrl()
+	public function getBaseApiUrl(): string
 	{
-		throw new Exception("Implement the getBaseApiUrl() method in " . static::class);
+		if (!$this->baseApiUrl) {
+			throw new Exception('Base API URL not set for ' . static::class . ' - please set in constructor or override getBaseApiUrl() method');
+		}
+
+		return $this->baseApiUrl;
 	}
 
 	/**
@@ -155,8 +162,6 @@ abstract class Api
 	 * Throttle requests (if THROTTLE_ATTEMPTS is set) to avoid hitting rate limits
 	 * NOTE: uses defined consts THROTTLE_ATTEMPTS and THROTTLE_DECAY_SECONDS
 	 *
-	 * @throws ContainerExceptionInterface
-	 * @throws NotFoundExceptionInterface
 	 * @throws Exception
 	 */
 	public function throttle()
@@ -190,7 +195,7 @@ abstract class Api
 					'Accept'       => 'application/json',
 				];
 
-			$options['base_uri'] = $this->provider()?->getBaseApiUrl() ?? $this->getBaseApiUrl();
+			$options['base_uri'] = $this->baseApiUrl ?: $this->getBaseApiUrl();
 
 			$this->client = new Client($options);
 		}
@@ -435,7 +440,7 @@ abstract class Api
 
 		// Reset the query params
 		$queryParams       = $this->queryParams;
-		$this->queryParams = null;
+		$this->queryParams = [];
 
 		$client = $this->client();
 
