@@ -1,6 +1,9 @@
 <?php
 
 return [
+	'encryption'          => [
+		'key' => env('LARAVEL_ENV_ENCRYPTION_KEY'),
+	],
 	'audit'               => [
 		'enabled' => env('AUDIT_ENABLED', env('AUDITING_ENABLED', false)),
 

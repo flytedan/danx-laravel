@@ -27,8 +27,19 @@ class VaporEncryptCommand extends Command
 	public function handle()
 	{
 		$cipher = 'AES-256-CBC';
-		$key    = $this->parseKey(config('app.encryption_key'));
-		$env    = $this->argument('env');
+		$key    = config('danx.encryption.key');
+
+		if (!$key) {
+			$generatedKey = $this->generateAES256CBCKey();
+			$this->components->error("Encryption key not found.");
+			$this->components->info("Please install this key in your .env file");
+			$this->components->info("LARAVEL_ENV_ENCRYPTION_KEY=$generatedKey");
+
+			return Command::FAILURE;
+		}
+
+		$key = $this->parseKey($key);
+		$env = $this->argument('env');
 
 		$environmentFile = base_path('.env') . '.' . $env;
 		$encryptedFile   = $environmentFile . '.encrypted';
@@ -76,5 +87,10 @@ class VaporEncryptCommand extends Command
 		}
 
 		return $key;
+	}
+
+	protected function generateAES256CBCKey()
+	{
+		return base64_encode(random_bytes(32));
 	}
 }

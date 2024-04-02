@@ -26,10 +26,10 @@ class VaporDecryptCommand extends Command
 
 	public function handle()
 	{
-		$key = config('app.encryption_key');
+		$key = config('danx.encryption.key');
 
 		if (!$key) {
-			$this->components->error('The app.encryption_key config is required.');
+			$this->components->error('The danx.encryption.key config is required.');
 
 			return Command::FAILURE;
 		}

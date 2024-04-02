@@ -182,7 +182,7 @@ return new class extends Migration {
 		Schema::dropIfExists('error_logs');
 
 		Schema::dropIfExists('error_log_entry');
-		
+
 		Schema::dropIfExists('audits');
 
 		Schema::dropIfExists('audit_request');
