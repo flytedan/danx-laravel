@@ -27,7 +27,7 @@ class DanxServiceProvider extends ServiceProvider
 		]);
 
 		$this->publishes([
-			__DIR__ . '/../.tinkerwell/CustomAuditDriver.php' => base_path('.tinkerwell/CustomAuditDriver.php'),
+			__DIR__ . '/../.tinkerwell' => base_path('.tinkerwell'),
 		]);
 
 		if ($this->app->runningInConsole()) {

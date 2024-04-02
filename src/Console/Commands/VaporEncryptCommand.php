@@ -26,8 +26,17 @@ class VaporEncryptCommand extends Command
 
 	public function handle()
 	{
+		$key = config('app.encryption_key');
+
+		if (!$key) {
+			$generatedKey = base64_encode(random_bytes(64));
+			$this->components->error("Encryption key not found. \n\n\tPlease install this key in your .env file: LARAVEL_ENV_ENCRYPTION_KEY=base64:$generatedKey");
+
+			return Command::FAILURE;
+		}
+
 		$cipher = 'AES-256-CBC';
-		$key    = $this->parseKey(config('app.encryption_key'));
+		$key    = $this->parseKey($key);
 		$env    = $this->argument('env');
 
 		$environmentFile = base_path('.env') . '.' . $env;
