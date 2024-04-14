@@ -19,6 +19,8 @@ class FixPermissions extends Command
 			'chmod -R 777 config',
 			'chmod -R 777 database',
 			'chmod -R 777 public',
+			'chmod -R 777 resources',
+			'chmod -R 777 .',
 		];
 
 		foreach($commands as $command) {
