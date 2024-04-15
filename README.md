@@ -11,23 +11,27 @@ composer require danx/laravel
 ### Publish the configuration file
 
 ```bash
-php artisan vendor:publish --provider="Danx\DanxServiceProvider" --tag="config"
+sail artisan vendor:publish --provider="Flytedan\DanxLaravel\DanxServiceProvider"
 ```
 
 ## Development
 
-### Install dependencies
+### Install Danx UI
 
-```bash
-composer install
+[Setup Danx UI](https://github.com/flytedan/quasar-ui-danx)
+
+#### Configure CORS
+```
+sail artisan config:publish cors
 ```
 
-### Publish package to composer
+* Configure the `paths` so the desired routes are allowed
+  * NOTE: By default it is open to all requests
+
+## Publish package to composer
 
 To publish packages, simply push a new tagged version to the repository.
 
 ```bash
-git tag -a v0.1.0 -m "Initial release"
-git push origin v0.1.0
+make VERSION=1.0.0 publish
 ```
-
