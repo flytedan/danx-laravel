@@ -24,7 +24,7 @@ class FixPermissions extends Command
 		];
 
 		foreach($commands as $command) {
-			(new Process(explode(' ', $command), base_path()))->mustRun();
+			(new Process(explode(' ', $command), base_path('')))->mustRun();
 			$this->info("Executed: $command");
 		}
 
