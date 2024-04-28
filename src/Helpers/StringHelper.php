@@ -83,13 +83,13 @@ class StringHelper
 	{
 		$dimensions = [];
 
-		preg_match('/^(\d+)\s*x\s*(\d+)\s*(\w+)$/', $dimensionsStr, $matches);
+		preg_match('/^([\d.]+)\s*x\s*([\d.]+)\s*(\w*)$/', $dimensionsStr, $matches);
 		if (count($matches) === 4) {
 			$dimensions['width']  = $matches[1];
 			$dimensions['height'] = $matches[2];
 			$dimensions['unit']   = $matches[3];
 		} else {
-			preg_match('/^(\d+)\s*:\s*(\d+)\s*$/', $dimensionsStr, $matches);
+			preg_match('/^([\d.]+)\s*:\s*([\d.]+)\s*$/', $dimensionsStr, $matches);
 			if (count($matches) === 3) {
 				$dimensions['width_ratio']  = $matches[1];
 				$dimensions['height_ratio'] = $matches[2];
@@ -298,12 +298,16 @@ class StringHelper
 	 * Also limit the text to a max length. If the text is not safe / too long, convert it into a printable number of
 	 * bytes.
 	 *
-	 * @param     $string
-	 * @param int $maxLength
-	 * @return string
+	 * @param $string
+	 * @param $maxLength
+	 * @return array|false|string|string[]|null
 	 */
-	public static function logSafeString($string, $maxLength = 10000): string
+	public static function logSafeString($string, $maxLength = 10000)
 	{
+		if (!is_string($string)) {
+			$string = static::safeJsonEncode($string);
+		}
+
 		// Make sure the string is at most $maxLength characters
 		if (mb_detect_encoding($string) === false || strlen($string) > $maxLength) {
 			// Split the string, so it is $maxLength characters with the first 90% from the start and 10% from the end of the string.
@@ -318,10 +322,10 @@ class StringHelper
 	}
 
 	/**
-	 * @param string $string
+	 * @param $string
 	 * @return string
 	 */
-	public static function safeConvertToUTF8(string $string): string
+	public static function safeConvertToUTF8(string $string)
 	{
 		try {
 			// Try to filter out binary or strings that are non-human readable characters if they are longer than 500 characters
