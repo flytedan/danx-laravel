@@ -97,6 +97,8 @@ class DateHelper
 	}
 
 	/**
+	 * Display a timestamp as a human-readable string in format "X h Y m Z s W ms"
+	 *
 	 * @param     $time
 	 * @param int $unit
 	 * @return string
@@ -114,12 +116,14 @@ class DateHelper
 		$minutes = floor($time / $unitsPerMinute);
 		$time    -= $minutes * $unitsPerMinute;
 
-		$seconds = $time / $unit;
+		$seconds = $milliseconds ? floor($time / $unit) : $time / $unit;
+
+		$milliseconds %= 1000;
 
 		return
 			trim(($hours ? "$hours h " : '') .
 				($minutes ? "$minutes m " : '') .
-				((!$milliseconds || $seconds) ? "$seconds s " : '') .
+				((!$milliseconds || ($seconds >= 1)) ? "$seconds s " : '') .
 				($milliseconds !== false ? "$milliseconds ms" : ''));
 	}
 
@@ -332,13 +336,11 @@ class DateHelper
 	 * @param null   $end
 	 * @param null   $start
 	 * @return float
-	 *
-	 * @throws Exception
 	 */
 	public static function timer(
 		$name = null,
 		int $precision = 2,
-		int $unit = self::TIMER_SECOND
+		int $unit = self::TIMER_MILLISECOND
 	)
 	{
 		if (!$name) {
@@ -356,11 +358,21 @@ class DateHelper
 	 * @param     $precision
 	 * @param int $unit
 	 * @return string
-	 *
-	 * @throws Exception
 	 */
-	public static function timerStr($name = null, $precision = 2, int $unit = self::TIMER_SECOND)
+	public static function timerStr($name = null, $precision = 2, int $unit = self::TIMER_MILLISECOND)
 	{
-		return static::timeToString(static::timer($name, $precision, $unit), $unit);
+		static $lastTimestamp = [];
+		$name             = $name ?? 'default';
+		$currentTimestamp = static::timer($name, $precision, $unit);
+		$timeSinceLast    = round($currentTimestamp - ($lastTimestamp[$name] ?? 0), $precision);
+
+		// Show the current timing since the last timestamp
+		$str = static::timeToString($timeSinceLast, $unit);
+		// Show the total time since the timer was started
+		$str .= ' (' . static::timeToString($currentTimestamp, $unit) . ')';
+
+		$lastTimestamp[$name] = $currentTimestamp;
+
+		return "[$name: $str]";
 	}
 }
