@@ -8,12 +8,11 @@ use Throwable;
 
 /**
  * This trait is to be used with the 'ref' field $table->string('ref')->unique() schema definition
- *
  * @mixin Model
  */
 trait RefModelTrait
 {
-	public static $refPrefix = 'REF-';
+	static string $refPrefix = '';
 
 	/**
 	 * This function overwrites the default boot static method of Eloquent models. It will hook
@@ -40,5 +39,16 @@ trait RefModelTrait
 	public static function generateRef()
 	{
 		return Ref::generate(static::$refPrefix);
+	}
+
+	/**
+	 * @return $this
+	 * @throws Throwable
+	 */
+	public function assignRef()
+	{
+		$this->ref = static::generateRef();
+
+		return $this;
 	}
 }

@@ -6,9 +6,6 @@ use Carbon\Carbon;
 use Carbon\CarbonInterface;
 use Exception;
 
-/**
- * Class DateHelper
- */
 class DateHelper
 {
 	const
