@@ -3,7 +3,6 @@
 namespace Flytedan\DanxLaravel\Exceptions;
 
 use Exception;
-use Monolog\Level;
 
 /**
  * This is a generic ValidationError that expects to render a client side message to the User.
@@ -11,7 +10,7 @@ use Monolog\Level;
  */
 class ValidationError extends Exception
 {
-	public static int $level = (int)Level::Warning;
+	public static int $level = 300;
 
 	public function isClientSafe()
 	{
