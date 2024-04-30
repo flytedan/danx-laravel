@@ -43,13 +43,11 @@ class ErrorLog extends Model
 	];
 
 	/**
-	 * @param                 $level
-	 * @param Exception|Error $exception
-	 * @param array           $data
-	 * @param ErrorLog|null   $parent
+	 * @param                           $level
+	 * @param Throwable|Exception|Error $exception
+	 * @param array                     $data
+	 * @param ErrorLog|null             $parent
 	 * @return ErrorLog|Model|object
-	 *
-	 * @throws Exception
 	 */
 	public static function logException($level, Throwable|Exception|Error $exception, array $data = [], ErrorLog $parent = null)
 	{
@@ -94,8 +92,11 @@ class ErrorLog extends Model
 		return $errorLog;
 	}
 
-
-	public static function getLevelName($level)
+	/**
+	 * @param $level
+	 * @return string
+	 */
+	public static function getLevelName($level): string
 	{
 		return match ($level) {
 			self::DEBUG => 'DEBUG',
@@ -135,10 +136,8 @@ class ErrorLog extends Model
 	 * @param int   $code
 	 * @param array $data
 	 * @return ErrorLog|Model
-	 *
-	 * @throws Exception
 	 */
-	public static function logErrorMessage($level, $message, $code = 0, array $data = [])
+	public static function logErrorMessage($level, $message, int $code = 0, array $data = [])
 	{
 		// Ignore logging Warnings
 		if ($level === 'WARNING') {
@@ -161,8 +160,6 @@ class ErrorLog extends Model
 	 * @param string   $message
 	 * @param array    $data
 	 * @return ErrorLog|Builder|Model|object
-	 *
-	 * @throws Exception
 	 */
 	public static function log(ErrorLog $errorLog, string $message, array $data = [])
 	{
@@ -202,10 +199,8 @@ class ErrorLog extends Model
 
 	/**
 	 * @param null $data
-	 *
-	 * @throws Exception
 	 */
-	public function addEntry($message, $data = null)
+	public function addEntry($message, $data = null): void
 	{
 		$message = StringHelper::logSafeString($message, self::MAX_FULL_MESSAGE_SIZE);
 
@@ -221,7 +216,7 @@ class ErrorLog extends Model
 	/**
 	 * @return string
 	 */
-	public function generateHash()
+	public function generateHash(): string
 	{
 		if ($this->stack_trace) {
 			$id = json_encode($this->stack_trace);

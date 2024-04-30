@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Schema;
 use OwenIt\Auditing\Contracts\Audit as AuditContract;
 use OwenIt\Auditing\Contracts\Auditable;
 use OwenIt\Auditing\Contracts\AuditDriver as AuditDriverContract;
+use OwenIt\Auditing\Exceptions\AuditingException;
 
 class AuditDriver implements AuditDriverContract
 {
@@ -43,10 +44,8 @@ class AuditDriver implements AuditDriverContract
 	 * @param      $type
 	 * @param      $message
 	 * @param null $data
-	 *
-	 * @throws Exception
 	 */
-	public static function log($type, $message, $data = null)
+	public static function log($type, $message, $data = null): void
 	{
 		$entry = (object)[
 			'user_type'      => '',
@@ -66,7 +65,6 @@ class AuditDriver implements AuditDriverContract
 	 * @param $url
 	 *
 	 * @return AuditRequest|null
-	 * @throws Exception
 	 */
 	public static function logRequest($url): ?AuditRequest
 	{
@@ -76,8 +74,6 @@ class AuditDriver implements AuditDriverContract
 	/**
 	 * This method should only be called when Laravel is about to terminate execution.
 	 * Handles filling in response / post execution data
-	 *
-	 * @throws Exception
 	 */
 	public static function terminate($response = null)
 	{
@@ -98,8 +94,6 @@ class AuditDriver implements AuditDriverContract
 	 * if it has not, this implies there have been no data changes yet,
 	 * so lets check to see if we should ignore this request all together (ie: this is a cron job
 	 * running every minute)
-	 *
-	 * @throws Exception
 	 */
 	public static function getAuditRequestOrIgnore()
 	{
@@ -116,7 +110,7 @@ class AuditDriver implements AuditDriverContract
 	 * @param Response $response
 	 * @return array
 	 */
-	public static function getResponse($response)
+	public static function getResponse($response): array
 	{
 		//XXX: apparently laravel 5.4 has not updated all the response classes to use the new status / content methods (eg: the BinaryFileResponse).
 		$responseStatus = method_exists($response, 'status') ? $response->status() : $response->getStatusCode();
@@ -150,8 +144,7 @@ class AuditDriver implements AuditDriverContract
 	 *
 	 * @param Auditable $model
 	 * @return AuditContract
-	 *
-	 * @throws Exception
+	 * @throws AuditingException
 	 */
 	public function audit(Auditable $model): AuditContract
 	{
@@ -167,8 +160,6 @@ class AuditDriver implements AuditDriverContract
 	 * @param                      $data
 	 * @param Model|Auditable|null $model
 	 * @return Audit|Model
-	 *
-	 * @throws Exception
 	 */
 	public static function createEntry($event, $data, Model|Auditable $model = null): ?Audit
 	{
@@ -218,8 +209,6 @@ class AuditDriver implements AuditDriverContract
 	 * object on subsequent calls
 	 *
 	 * @return AuditRequest|Model
-	 *
-	 * @throws Exception
 	 */
 	public static function getAuditRequest($url = null): ?AuditRequest
 	{
