@@ -8,6 +8,7 @@ use Flytedan\DanxLaravel\Models\Audit\AuditRequest;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 use OwenIt\Auditing\Contracts\Audit as AuditContract;
 use OwenIt\Auditing\Contracts\Auditable;
 use OwenIt\Auditing\Contracts\AuditDriver as AuditDriverContract;
@@ -401,7 +402,13 @@ class AuditDriver implements AuditDriverContract
 						$tableName = $model?->getTable();
 						if ($tableName) {
 							$decimalPlaces = cache()->rememberForever($tableName . '.' . $key,
-								fn() => $model?->getConnection()->getDoctrineColumn($tableName, $key)->getScale());
+								function () use ($tableName, $key) {
+									if (preg_match("#decimal\\(\\d+,(\\d+)\\)#", Schema::getColumnType($tableName, $key, true), $matches)) {
+										return $matches[1] ?? 0;
+									}
+
+									return null;
+								});
 
 							if ($decimalPlaces) {
 								$oldValue = round($oldValue, $decimalPlaces);
