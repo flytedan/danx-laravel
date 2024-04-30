@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Log;
+use Throwable;
 
 class ErrorLog extends Model
 {
@@ -50,7 +51,7 @@ class ErrorLog extends Model
 	 *
 	 * @throws Exception
 	 */
-	public static function logException($level, Exception|Error $exception, array $data = [], ErrorLog $parent = null)
+	public static function logException($level, Throwable|Exception|Error $exception, array $data = [], ErrorLog $parent = null)
 	{
 		// Ignore logging Warnings or lower
 		if (isset($exception::$level) && $exception::$level <= 300 || $level === 'WARNING') {
@@ -86,8 +87,8 @@ class ErrorLog extends Model
 		$errorLog = self::log($errorLog, $message, $data);
 
 		// If this is a new error log entry, lets map out the children
-		if ($exception->getPrevious()) {
-			self::logException($level, $exception->getPrevious(), [], $errorLog);
+		if ($previous = $exception->getPrevious()) {
+			self::logException($level, $previous, [], $errorLog);
 		}
 
 		return $errorLog;
