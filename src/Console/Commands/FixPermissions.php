@@ -7,7 +7,7 @@ use Symfony\Component\Process\Process;
 
 class FixPermissions extends Command
 {
-	protected $signature   = 'app:fix-permissions';
+	protected $signature   = 'fix';
 	protected $description = 'Fix permissions for running the app in sail w/ Docker Desktop as there are issues mapping user/group ID';
 
 	public function handle()
@@ -20,7 +20,8 @@ class FixPermissions extends Command
 			'chmod -R 777 database',
 			'chmod -R 777 public',
 			'chmod -R 777 resources',
-			'chmod -R 777 .',
+			'chmod 777 .',
+			'chmod 777 composer.json',
 		];
 
 		foreach($commands as $command) {
