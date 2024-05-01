@@ -212,8 +212,6 @@ class AuditDriver implements AuditDriverContract
 	 */
 	public static function getAuditRequest($url = null): ?AuditRequest
 	{
-		static $retry = 1;
-
 		// If auditing is disabled, do nothing
 		if (!config('danx.audit.enabled')) {
 			return null;
@@ -230,12 +228,10 @@ class AuditDriver implements AuditDriverContract
 					'time'        => 0,
 				]);
 			} catch(Exception $e) {
-				if ($retry--) {
-					if (config('danx.audit.debug')) {
-						Log::debug("Failed to create audit request. Auditing has been disabled.\n\n" . $e->getMessage());
-					}
-					config()->set('danx.audit.enabled', false);
+				if (config('danx.audit.debug')) {
+					Log::debug("Failed to create audit request. Auditing has been disabled.\n\n" . $e->getMessage());
 				}
+				config()->set('danx.audit.enabled', false);
 
 				return null;
 			}

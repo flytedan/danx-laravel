@@ -322,10 +322,10 @@ class StringHelper
 	}
 
 	/**
-	 * @param $string
+	 * @param string $string
 	 * @return string
 	 */
-	public static function safeConvertToUTF8(string $string)
+	public static function safeConvertToUTF8(string $string): string
 	{
 		try {
 			// Try to filter out binary or strings that are non-human readable characters if they are longer than 500 characters
