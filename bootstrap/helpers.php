@@ -39,7 +39,7 @@ if (!function_exists('user')) {
 	/**
 	 * Returns an authenticated User
 	 *
-	 * @return Authenticatable|User|null
+	 * @return Authenticatable|\App\Models\User|null
 	 */
 	function user()
 	{

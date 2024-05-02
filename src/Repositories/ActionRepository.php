@@ -91,7 +91,7 @@ abstract class ActionRepository
 	 * @return mixed|bool|null
 	 * @throws ValidationError
 	 */
-	public function applyAction(string $action, ?Model $model, array $data)
+	public function applyAction(string $action, $model = null, ?array $data = null)
 	{
 		// Handle the action
 		return match ($action) {

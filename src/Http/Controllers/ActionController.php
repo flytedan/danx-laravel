@@ -45,7 +45,7 @@ abstract class ActionController extends Controller
 	protected function item($instance)
 	{
 		if (static::$resource) {
-			return new static::$resource($instance);
+			return static::$resource::make($instance);
 		}
 
 		return $instance;
@@ -139,7 +139,7 @@ abstract class ActionController extends Controller
 		try {
 			$result = $this->repo()->applyAction($action, $model, $data);
 
-			if ($result instanceof Model) {
+			if (!$model && ($result instanceof Model)) {
 				$model  = $result;
 				$result = true;
 			}
@@ -147,7 +147,7 @@ abstract class ActionController extends Controller
 			return response([
 				'success' => true,
 				'result'  => $result,
-				'item'    => $this->item($model?->refresh()),
+				'item'    => $model ? $this->item($model->refresh()) : null,
 			]);
 		} catch(Throwable $throwable) {
 			$response = [
@@ -178,17 +178,16 @@ abstract class ActionController extends Controller
 	{
 		$filter = $request->filter();
 		$input  = $request->input();
+		$action = $input['action'] ?? $request->get('action');
+		$data   = $input['data'] ?? $request->get('data', []);
 
 		if (!$filter || empty($filter['id'])) {
 			return response("Selection is required for batch updates", 400);
 		}
 
-		if (!$input) {
-			return response("No input provided", 400);
+		if (!$action) {
+			return response("No action provided", 400);
 		}
-
-		$action = $input['action'] ?? null;
-		$data   = $input['data'] ?? [];
 
 		$errors = $this->repo()->batchAction($filter, $action, $data);
 

@@ -90,6 +90,11 @@ abstract class Api
 	/** @var Client a temporary override for the client that will be reset after the next request */
 	private $overrideClient;
 
+	public static function make()
+	{
+		return new static();
+	}
+
 	/**
 	 * @return ResponseInterface
 	 */
@@ -549,10 +554,10 @@ abstract class Api
 	/**
 	 * Return the JSON response as an associative array
 	 *
-	 * @param bool $assoc
-	 * @return mixed|null
+	 * @param string|null $key
+	 * @return array|string|int|float|bool|null
 	 */
-	public function json($assoc = true)
+	public function json(string $key = null): float|int|bool|array|string|null
 	{
 		if (!$this->response) {
 			return null;
@@ -564,7 +569,13 @@ abstract class Api
 			return null;
 		}
 
-		return json_decode($this->rawContent, $assoc);
+		$json = json_decode($this->rawContent, true);
+
+		if ($key) {
+			return $json[$key] ?? null;
+		}
+
+		return $json;
 	}
 
 	public function getRawContent()
