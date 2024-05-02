@@ -2,6 +2,7 @@
 
 namespace Flytedan\DanxLaravel;
 
+use Flytedan\DanxLaravel\Console\Commands\DanxLinkCommand;
 use Flytedan\DanxLaravel\Console\Commands\FixPermissions;
 use Flytedan\DanxLaravel\Console\Commands\SyncDirtyJobsCommand;
 use Flytedan\DanxLaravel\Console\Commands\VaporDecryptCommand;
@@ -32,6 +33,7 @@ class DanxServiceProvider extends ServiceProvider
 
 		if ($this->app->runningInConsole()) {
 			$this->commands([
+				DanxLinkCommand::class,
 				FixPermissions::class,
 				SyncDirtyJobsCommand::class,
 				VaporDecryptCommand::class,
