@@ -6,11 +6,18 @@ use Illuminate\Contracts\Auth\StatefulGuard;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
 
-function app(): App { }
+/**
+ * @template T
+ * @param class-string<T> $class
+ * @return T
+ */
+function app($class)
+{
+	return new $class;
+}
 
 function auth($guard = null): Factory|Guard|StatefulGuard { }
 
