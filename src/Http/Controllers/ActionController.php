@@ -58,7 +58,7 @@ abstract class ActionController extends Controller
 	protected function itemDetails($instance)
 	{
 		if (static::$detailsResource) {
-			return new static::$detailsResource($instance);
+			return static::$detailsResource::make($instance)->toArray(request());
 		}
 
 		return $instance;

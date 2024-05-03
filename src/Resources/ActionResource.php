@@ -13,16 +13,21 @@ use Illuminate\Http\Resources\Json\JsonResource;
  */
 abstract class ActionResource extends JsonResource
 {
+	protected static ?string $type = null;
+
 	public function __construct($resource)
 	{
+		if (!static::$type) {
+			throw new Exception("static::\$type is required to be set on " . static::class);
+		}
+
 		parent::__construct($resource);
-		$this->with = $this->data();
 	}
 
 	public function toArray($request)
 	{
-		return $this->with + [
-				'__type'      => preg_replace("/Resource\$/", '', preg_replace("/^.*\\\\/", '', static::class)),
+		return $this->data() + [
+				'__type'      => static::$type,
 				'__timestamp' => request()->header('X-Timestamp') ?: LARAVEL_START,
 			];
 	}
