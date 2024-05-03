@@ -9,6 +9,10 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
 
+if (!defined('LARAVEL_START')) {
+	define('LARAVEL_START', microtime(true));
+}
+
 /**
  * @template T
  * @param class-string<T> $class
