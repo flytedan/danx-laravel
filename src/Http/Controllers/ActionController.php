@@ -147,7 +147,7 @@ abstract class ActionController extends Controller
 			return response([
 				'success' => true,
 				'result'  => $result,
-				'item'    => $model ? $this->item($model->refresh()) : null,
+				'item'    => $model ? $this->details($model->refresh()) : null,
 			]);
 		} catch(Throwable $throwable) {
 			$response = [
