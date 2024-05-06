@@ -3,7 +3,7 @@
 namespace Flytedan\DanxLaravel\Helpers;
 
 use Flytedan\DanxLaravel\Library\CsvExport;
-use Flytedan\DanxLaravel\Models\File\File as FileModel;
+use Flytedan\DanxLaravel\Models\Utilities\StoredFile as FileModel;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\File as FileFacade;

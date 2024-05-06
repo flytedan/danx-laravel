@@ -48,3 +48,8 @@ function app_path($path): string { }
 function config_path($path): string { }
 
 function now(): Carbon { }
+
+function route($name, $parameters = [], $absolute = true): string
+{
+	return app('url')->route($name, $parameters, $absolute);
+}

@@ -1,8 +1,7 @@
 <?php
 
-namespace Flytedan\DanxLaravel\Models\File;
+namespace Flytedan\DanxLaravel\Models\Utilities;
 
-use Exception;
 use Flytedan\DanxLaravel\Helpers\FileHelper;
 use Flytedan\DanxLaravel\Traits\SerializesDates;
 use Flytedan\DanxLaravel\Traits\UuidModelTrait;
@@ -11,12 +10,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Filesystem\FilesystemAdapter;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use OwenIt\Auditing\Auditable;
 use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 
-class File extends Model implements AuditableContract
+class StoredFile extends Model implements AuditableContract
 {
 	use
 		Auditable,
@@ -80,20 +78,7 @@ class File extends Model implements AuditableContract
 		self::MIME_WEBM,
 	];
 
-	const CANNOT_TRANSCODE_MIMES = [
-		self::MIME_EXCEL,
-		self::MIME_HTML,
-		self::MIME_JSON,
-		self::MIME_MS_OFFICE,
-		self::MIME_OCTET,
-		self::MIME_OPEN_SHEET,
-		self::MIME_OPEN_WORD,
-		self::MIME_TEXT,
-		self::MIME_ZIP,
-	];
-
-	protected $table = 'file';
-
+	protected $table   = 'stored_files';
 	protected $keyType = 'string';
 
 	protected $fillable = [
@@ -102,28 +87,16 @@ class File extends Model implements AuditableContract
 		'filepath',
 		'url',
 		'mime',
-		'requires_transcode',
-		'is_transcode_complete',
-		'transcodes',
-		'transcoding_start_at',
 		'size',
 		'exif',
 		'meta',
-		'storable_subtype',
 	];
 
 	protected $casts = [
-		'transcodes' => 'json',
-		'exif'       => 'json',
-		'meta'       => 'json',
-		'location'   => 'json',
+		'exif'     => 'json',
+		'meta'     => 'json',
+		'location' => 'json',
 	];
-
-	/** @var string Cached file contents blob */
-	protected $contents;
-
-	/** @var bool If the cached content has changed */
-	protected $contentsChanged = false;
 
 	/**
 	 * Synchronize the list of files to the instance type. Disassociates any existing
@@ -132,16 +105,14 @@ class File extends Model implements AuditableContract
 	 * @param      $id
 	 * @param      $type
 	 * @param      $files
-	 * @param null $subtype
 	 * @return bool
 	 */
-	public static function sync($id, $type, $files, $subtype = null)
+	public static function sync($id, $type, $files)
 	{
 		self::unguard();
 		// Remove any old files currently associated to the type instance
 		self::where('storable_id', $id)
 			->where('storable_type', $type)
-			->where('storable_subtype', $subtype)
 			->update([
 				'storable_id'   => '',
 				'storable_type' => '',
@@ -150,9 +121,8 @@ class File extends Model implements AuditableContract
 		// Associate the new files to the type instance
 		self::whereIn('id', $files)
 			->update([
-				'storable_id'      => $id,
-				'storable_type'    => $type,
-				'storable_subtype' => $subtype,
+				'storable_id'   => $id,
+				'storable_type' => $type,
 			]);
 		self::reguard();
 
@@ -182,45 +152,6 @@ class File extends Model implements AuditableContract
 	}
 
 	/**
-	 * Returns the file contents either from the disk or any cached version
-	 * This is useful if we want to make a series of changes to a file
-	 * (ie: transcoding a file's contents)
-	 *
-	 * @return false|string
-	 */
-	public function getContents()
-	{
-		// Cache file contents for quick retrieval
-		if (!$this->contents) {
-			$this->contents = $this->storageDisk()->get($this->filepath);
-		}
-
-		return $this->contents;
-	}
-
-	/**
-	 * Sets the cached contents for the file, does not write the file to the storage location
-	 *
-	 * @param $contents
-	 * @return $this
-	 */
-	public function setContents($contents)
-	{
-		$this->contents        = $contents;
-		$this->contentsChanged = true;
-
-		return $this;
-	}
-
-	/**
-	 * @return bool
-	 */
-	public function isContentsDirty()
-	{
-		return $this->contentsChanged;
-	}
-
-	/**
 	 * @return Filesystem|FilesystemAdapter
 	 */
 	public function storageDisk()
@@ -229,14 +160,23 @@ class File extends Model implements AuditableContract
 	}
 
 	/**
+	 * @return string|null
+	 */
+	public function getContents()
+	{
+		return $this->storageDisk()->get($this->filepath);
+	}
+
+	/**
 	 * Writes any changes to the file's contents to the new filepath (if given)
 	 * and updates the file's stored size.
 	 * NOTE: This does NOT save the file! If you do not save it, the file will still reference the original
 	 *
-	 * @param null $filePath
+	 * @param string $contents
+	 * @param null   $filePath
 	 * @return mixed
 	 */
-	public function write($filePath = null, $public = true)
+	public function write($contents, $filePath = null, $public = true)
 	{
 		if ($filePath) {
 			$this->filepath = $filePath;
@@ -245,7 +185,7 @@ class File extends Model implements AuditableContract
 		// Save it on the disk
 		$this->storageDisk()->put(
 			$this->filepath,
-			$this->contents,
+			$contents,
 			$public ? 'public' : null
 		);
 
@@ -253,152 +193,8 @@ class File extends Model implements AuditableContract
 		$this->url  = $this->storageDisk()->url($this->filepath);
 		$this->size = $this->storageDisk()->size($this->filepath);
 
-		// Reset the flag so we know the contents have been saved to disk
-		$this->contentsChanged = false;
-
 		// Return the URL pointing to the formatted image stored on the disk
 		return $this;
-	}
-
-	/**
-	 * Starts the transcoding process for the file by setting up the transcode placeholder data in the transcodes JSON
-	 * object
-	 * @param $name
-	 * @param $filepath
-	 * @param $meta
-	 * @return $this
-	 */
-	public function startTranscode($name, $filepath, $meta = [])
-	{
-		$transcodes        = $this->transcodes ?: [];
-		$transcodes[$name] = [
-				'filepath' => $filepath,
-				'url'      => $this->storageDisk()->url($filepath),
-				'size'     => 0,
-				'start_at' => now()->toDateTimeString(),
-			] + $meta;
-
-		$this->setAttribute('transcodes', $transcodes);
-
-		return $this;
-	}
-
-	/**
-	 * Writes this file's cached contents as a transcoded version of the file
-	 *
-	 * @param       $name
-	 * @param array $meta
-	 * @return $this
-	 * @throws Exception
-	 */
-	public function writeTranscode($name, $meta = [])
-	{
-		$transcodes = $this->transcodes ?: [];
-		$transcode  = $transcodes[$name] ?? null;
-
-		if (!$transcode) {
-			throw new Exception("Failed saving transcoded file: No transcode found for $name. Did you try startTranscode($name)? File ID $this->id");
-		}
-
-		$filepath = $transcode['filepath'];
-		Log::debug('Writing transcode to ' . $this->storageDisk()->url($filepath));
-
-		// Only save the transcoded file if there were changes
-		if (!$this->isContentsDirty()) {
-			throw new Exception("Failed saving transcoded file $filepath: There were no changes to the file");
-		}
-
-		// Save it on the disk
-		$this->storageDisk()->put(
-			$filepath,
-			$this->contents,
-			// All transcodes are intended to be public
-			'public'
-		);
-
-		$transcode['size']         = $this->storageDisk()->size($filepath);
-		$transcode['completed_at'] = now()->toDateTimeString();
-		$transcode                 += $meta;
-		$transcodes[$name]         = $transcode;
-
-		$this->setAttribute('transcodes', $transcodes);
-
-		// Always reset the contents after transcoding, so they will not be used for something else on accident
-		$this->contents        = null;
-		$this->contentsChanged = false;
-
-		return $this;
-	}
-
-	/**
-	 * Sets the contents of the file to the given transcoded file
-	 *
-	 * @param $name
-	 * @return mixed|null
-	 *
-	 */
-	public function useTranscode($name)
-	{
-		if ($this->hasTranscode($name)) {
-			$transcode = $this->transcodes[$name];
-
-			$this->contents        = $this->storageDisk()->get($transcode['filepath']);
-			$this->contentsChanged = false;
-
-			return $transcode;
-		} else {
-			return null;
-		}
-	}
-
-	/**
-	 * Check if this file has already been transcoded in the given format
-	 *
-	 * @param $name
-	 * @return bool
-	 */
-	public function hasTranscode($name)
-	{
-		return $this->transcodes && !empty($this->transcodes[$name]['size']);
-	}
-
-	/**
-	 * Retrieve the URL for the desired transcode of the file
-	 *
-	 * @param $name
-	 * @return File|array|null
-	 */
-	public function transcodedFile($names)
-	{
-		$names = is_array($names) ? $names : [$names];
-		foreach($names as $name) {
-			if ($this->hasTranscode($name)) {
-				$tFile = $this->transcodes[$name];
-
-				$mime = match ($name) {
-					'mp4' => 'video/mp4',
-					default => 'image/png',
-				};
-
-				return new File([
-					'url'  => $tFile['url'],
-					'size' => $tFile['size'],
-					'mime' => $mime,
-				]);
-			}
-		}
-
-		return null;
-	}
-
-	/**
-	 * Checks if the transcoding lock is set on the File
-	 *
-	 * @return mixed|string|null
-	 */
-	public function isLockedForTranscoding()
-	{
-		return $this->refresh()->transcoding_start_at;
 	}
 
 	/**
@@ -463,16 +259,6 @@ class File extends Model implements AuditableContract
 	}
 
 	/**
-	 * Checks if this is a known mime type that cannot be transcoded
-	 *
-	 * @return bool
-	 */
-	public function cannotTranscode()
-	{
-		return in_array($this->mime, static::CANNOT_TRANSCODE_MIMES);
-	}
-
-	/**
 	 * @return string|string[]
 	 */
 	public function extension()
@@ -495,15 +281,6 @@ class File extends Model implements AuditableContract
 	{
 		// Delete the actual stored file
 		$this->storageDisk()->delete($this->filepath);
-
-		// Make sure we clean up any transcoded files
-		if ($this->transcodes) {
-			foreach($this->transcodes as $transcode) {
-				if (!empty($transcode['filepath'])) {
-					$this->storageDisk()->delete($transcode['filepath']);
-				}
-			}
-		}
 
 		return parent::forceDelete();
 	}
