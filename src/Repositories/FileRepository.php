@@ -85,7 +85,7 @@ class FileRepository
 
 		// The URL can be a presigned URL in the case of s3 bucket uploads, so a use can upload directly to s3,
 		// Otherwise the URL should just be
-		if (config('filesystems.default') === 's3') {
+		if ($storedFile->disk === 's3') {
 			$storedFile->url = $this->createPresignedS3Url($filepath, $mime);
 		} else {
 			$storedFile->url = route('file.upload-presigned-url-contents', ['storedFile' => $storedFile->id]);
@@ -109,22 +109,21 @@ class FileRepository
 	{
 		$s3 = new S3Client([
 			'version'     => 'latest',
-			'region'      => config('aws.region'),
+			'region'      => config('filesystems.disks.s3.region'),
 			'credentials' => [
-				'key'    => config('aws.key'),
-				'secret' => config('aws.secret'),
+				'key'    => config('filesystems.disks.s3.key'),
+				'secret' => config('filesystems.disks.s3.secret'),
 			],
 		]);
 
 		$command = $s3->getCommand('PutObject', [
-			'Bucket'      => config('aws.bucket'),
+			'Bucket'      => config('filesystems.disks.s3.bucket'),
 			'Key'         => $filepath,
 			'ContentType' => $mime,
-			'ACL'         => 'public-read',
 		]);
 
 		// Allow the user 30 minutes to upload the file
-		$request = $s3->createPresignedRequest($command, '+30 minutes');
+		$request = $s3->createPresignedRequest($command, '+120 minutes');
 
 		return (string)$request->getUri();
 	}
