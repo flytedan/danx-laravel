@@ -8,6 +8,7 @@ use Flytedan\DanxLaravel\Exceptions\ValidationError;
 use Flytedan\DanxLaravel\Helpers\FileHelper;
 use Flytedan\DanxLaravel\Helpers\StringHelper;
 use Flytedan\DanxLaravel\Models\Utilities\StoredFile;
+use Flytedan\DanxLaravel\Resources\StoredFileResource;
 use getID3;
 use Illuminate\Http\File;
 use Illuminate\Http\UploadedFile;
@@ -73,7 +74,7 @@ class FileRepository
 			$mime = FileHelper::getMimeFromExtension($name);
 		}
 
-		$file = StoredFile::create([
+		$storedFile = StoredFile::create([
 			'disk'     => config('filesystems.default'),
 			'filepath' => $filepath,
 			'filename' => $name,
@@ -85,14 +86,14 @@ class FileRepository
 		// The URL can be a presigned URL in the case of s3 bucket uploads, so a use can upload directly to s3,
 		// Otherwise the URL should just be
 		if (config('filesystems.default') === 's3') {
-			$file->url = $this->createPresignedS3Url($filepath, $mime);
+			$storedFile->url = $this->createPresignedS3Url($filepath, $mime);
 		} else {
-			$file->url = route('file.upload-presigned-url-contents', ['fileResource' => $file->id]);
+			$storedFile->url = route('file.upload-presigned-url-contents', ['storedFile' => $storedFile->id]);
 		}
 
-		$file->save();
+		$storedFile->save();
 
-		return $file;
+		return $storedFile;
 	}
 
 	/**
@@ -131,10 +132,9 @@ class FileRepository
 	/**
 	 * Marks a presigned file upload as completed and sets mime / size / url on the File record
 	 *
-	 * @param StoredFile $file
 	 * @throws ValidationError
 	 */
-	public function presignedUploadUrlCompleted(StoredFile $file): void
+	public function presignedUploadUrlCompleted(StoredFile $file): StoredFileResource
 	{
 		if ($file->size > 0) {
 			throw new ValidationError("This presigned file upload has already been completed");
@@ -144,6 +144,8 @@ class FileRepository
 		$file->size = $disk->size($file->filepath);
 		$file->url  = $disk->url($file->filepath);
 		$file->save();
+
+		return StoredFileResource::make($file);
 	}
 
 	/**

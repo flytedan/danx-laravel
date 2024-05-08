@@ -13,7 +13,10 @@ use Illuminate\Http\Resources\Json\JsonResource;
  */
 abstract class ActionResource extends JsonResource
 {
-	protected static ?string $type = null;
+	protected static string $type = '';
+	public static           $wrap = '';
+
+	protected array $resolvedData;
 
 	public function __construct($resource)
 	{
@@ -22,11 +25,13 @@ abstract class ActionResource extends JsonResource
 		}
 
 		parent::__construct($resource);
+
+		$this->resolvedData = $this->data();
 	}
 
 	public function toArray($request)
 	{
-		return $this->data() + [
+		return $this->resolvedData + [
 				'__type'      => static::$type,
 				'__timestamp' => request()->header('X-Timestamp') ?: LARAVEL_START,
 			];

@@ -9,7 +9,9 @@ use Flytedan\DanxLaravel\Models\Utilities\StoredFile;
  */
 class StoredFileResource extends ActionResource
 {
-	public function toArray($request)
+	public static string $type = 'StoredFile';
+
+	public function data(): array
 	{
 		/** @var StoredFile|array $file */
 		$file = $this->resource;
