@@ -120,9 +120,9 @@ abstract class ActionController extends Controller
 	 * @param PagerRequest $request
 	 * @return array
 	 */
-	public function filterFieldOptions(PagerRequest $request)
+	public function fieldOptions(PagerRequest $request)
 	{
-		return $this->repo()->filterFieldOptions($request->filter());
+		return $this->repo()->fieldOptions($request->filter());
 	}
 
 	/**

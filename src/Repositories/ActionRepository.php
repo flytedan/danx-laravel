@@ -77,7 +77,7 @@ abstract class ActionRepository
 	 * @param array|null $filter
 	 * @return array
 	 */
-	public function filterFieldOptions(?array $filter = []): array
+	public function fieldOptions(?array $filter = []): array
 	{
 		return [];
 	}

@@ -26,7 +26,7 @@ class ActionRoute extends Route
 			// GET Data - NOTE: POST is included since filters can be too long for URLs in some browsers
 			self::addRoute($getPost, 'list', [$controller::class, 'list'])->name($name . '.list');
 			self::addRoute($getPost, 'summary', [$controller::class, 'summary'])->name($name . '.summary');
-			self::addRoute($getPost, 'filter-field-options', [$controller::class, 'filterFieldOptions'])->name($name . '.filterFieldOptions');
+			self::addRoute($getPost, 'field-options', [$controller::class, 'fieldOptions'])->name($name . '.field-options');
 			self::get('{id}/details', fn($model) => $controller->details($controller->repo()->instance($model)))->name($name . '.details');
 			self::addRoute($getPost, 'export', [$controller::class, 'export'])->name($name . '.export');
 
