@@ -67,7 +67,6 @@ abstract class ActionRepository
 			DB::raw('COUNT(*) as count'),
 		])
 			->filter($filter)
-			->getQuery()
 			->first() ?? [];
 	}
 
