@@ -35,7 +35,8 @@ abstract class Job implements ShouldQueue
 	protected static $disabledJobs = [];
 
 	// A flag to indicate a Job is running in this instance of the application
-	public static $isRunning = false;
+	public static              $isRunning  = false;
+	public static ?JobDispatch $runningJob = null;
 
 	/**
 	 * Class constructor.
@@ -417,6 +418,7 @@ abstract class Job implements ShouldQueue
 		]);
 
 		try {
+			Job::$runningJob = $this->jobDispatch;
 			app()->call($callback);
 
 			$this->jobDispatch->update([

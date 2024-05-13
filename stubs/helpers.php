@@ -18,7 +18,7 @@ if (!defined('LARAVEL_START')) {
  * @param class-string<T> $class
  * @return T
  */
-function app($class)
+function app($class = null)
 {
 	return new $class;
 }
