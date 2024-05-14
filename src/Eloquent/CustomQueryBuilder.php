@@ -299,6 +299,10 @@ class CustomQueryBuilder
 	 */
 	public function isRawColumn($column)
 	{
+		if (str_contains("->>'$.", $column)) {
+			return true;
+		}
+
 		return preg_match('/[)(]/', $column) || strpos($column, ' as ') > 1;
 	}
 

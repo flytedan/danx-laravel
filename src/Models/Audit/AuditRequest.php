@@ -72,6 +72,11 @@ class AuditRequest extends Model
 		return $this->hasMany(Audit::class);
 	}
 
+	public function scopeRequestMethod($query, $method)
+	{
+		return $query->where('request->method', $method);
+	}
+
 	/**
 	 * Get the HTTP request method
 	 *
