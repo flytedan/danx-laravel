@@ -45,11 +45,11 @@ class Audit extends Model implements AuditContract
 	}
 
 	/**
-	 * @return BelongsTo|User
+	 * @return BelongsTo
 	 */
 	public function user()
 	{
-		return $this->belongsTo(User::class)
+		return $this->belongsTo(config('auth.providers.users.model'))
 			->withTrashed();
 	}
 }

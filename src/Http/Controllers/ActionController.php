@@ -107,10 +107,14 @@ abstract class ActionController extends Controller
 	 * Return the item details for a detail view / filling out defaults in an editable form / etc.
 	 *
 	 * @param $model
-	 * @return JsonResponse
+	 * @return JsonResponse|Response
 	 */
 	public function details($model)
 	{
+		if (!$model) {
+			return response('Item not found', 404);
+		}
+
 		return $this->itemDetails($model);
 	}
 
