@@ -19,6 +19,7 @@ class FixPermissions extends Command
 			'chmod -R 777 config',
 			'chmod -R 777 database',
 			'chmod -R 777 public',
+			'chmod -R 777 routes',
 			'chmod -R 777 resources',
 			'chmod 777 .',
 			'chmod 777 composer.json',
