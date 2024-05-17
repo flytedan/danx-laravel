@@ -256,9 +256,10 @@ abstract class Job implements ShouldQueue
 		// Let other parts of the system know we're running inside a Job
 		self::$isRunning = true;
 
+		$user = $this->jobDispatch?->user()->first();
 		// Spoof this Job to run as the authenticated user who dispatched the job
-		if ($this->jobDispatch?->user) {
-			Auth::guard()->setUser($this->jobDispatch->user);
+		if ($user) {
+			Auth::guard()->setUser($user);
 		} elseif (self::$logoutUser) {
 			// Be sure to log out any previous user in case the same Job Runner instance had been authenticated
 			Auth::guard()->forgetUser();

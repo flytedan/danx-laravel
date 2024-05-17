@@ -49,6 +49,14 @@ class JobDispatch extends Model
 	];
 
 	/**
+	 * @return BelongsTo
+	 */
+	public function user(): BelongsTo
+	{
+		return $this->belongsTo(config('auth.providers.users.model'));
+	}
+
+	/**
 	 * @param $ref
 	 * @return JobDispatch|null
 	 */

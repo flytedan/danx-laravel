@@ -42,4 +42,8 @@ return [
 		'cdn_origin' => env('RESPONSE_SIZE_LIMIT_CDN_ORIGIN'),
 		'cdn_alias'  => env('RESPONSE_SIZE_LIMIT_CDN_ALIAS'),
 	],
+
+	'logging' => [
+		'output_exception_traces' => env('LOG_OUTPUT_EXCEPTION_TRACES', false),
+	],
 ];
