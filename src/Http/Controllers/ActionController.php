@@ -89,7 +89,7 @@ abstract class ActionController extends Controller
 			->sort($request->sort())
 			->paginate($request->perPage(50));
 
-		return $this->collection($results);
+		return $this->collection($results->items());
 	}
 
 	/**
