@@ -65,7 +65,9 @@ class ArrayHelper
 
 		$result = [];
 		foreach($array as $item) {
-			if (array_key_exists($firstKey, $item)) {
+			if (!is_array($item)) {
+				$result[] = $item;
+			} elseif (array_key_exists($firstKey, $item)) {
 				$result[$item[$firstKey]] = $item;
 			}
 		}
