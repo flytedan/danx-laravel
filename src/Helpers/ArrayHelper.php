@@ -49,6 +49,30 @@ class ArrayHelper
 		return array_diff_assoc($array1, $array2);
 	}
 
+	public static function groupByDot($array, $key)
+	{
+		// If the array is not an array just return
+		if (!is_array($array)) {
+			return null;
+		}
+
+		$keys     = is_array($key) ? $key : explode('.', $key);
+		$firstKey = array_shift($keys);
+
+		if (array_key_exists($firstKey, $array)) {
+			return self::groupByDot($array[$firstKey], $keys);
+		}
+
+		$result = [];
+		foreach($array as $item) {
+			if (array_key_exists($firstKey, $item)) {
+				$result[$item[$firstKey]] = $item;
+			}
+		}
+
+		return $result;
+	}
+
 	/**
 	 * Convert an array to a string using the keys as a label and the values as the content
 	 * The keys will be converted to Headline case (ie: replacing underscores/dashes/dots with spaces and capitalizing

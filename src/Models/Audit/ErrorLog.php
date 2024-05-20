@@ -88,11 +88,13 @@ class ErrorLog extends Model
 		if ($previous = $exception->getPrevious()) {
 			self::logException($level, $previous, [], $errorLog);
 		}
-
-
-		if (config('danx.logging.output_exception_traces')) {
-			Log::error("Task failed: " . $exception->getMessage() . "\n" . $exception->getFile() . ":" . $exception->getLine() . "\n\n" . $exception->getTraceAsString() . "\n");
-		}
+		
+		Log::error(
+			$errorLog->level . " " . basename($errorLog) . " ($errorLog->code)\n\n" .
+			"$errorLog->message\n\n" .
+			"$errorLog->file:$errorLog->line" .
+			(config('danx.logging.output_exception_traces') ? "\n\n" . $exception->getTraceAsString() . "\n" : '')
+		);
 
 		return $errorLog;
 	}
