@@ -151,6 +151,11 @@ class StoredFile extends Model implements AuditableContract
 		return $this->morphTo();
 	}
 
+	public function transcodes()
+	{
+		return $this->hasMany(StoredFile::class, 'original_stored_file_id');
+	}
+
 	/**
 	 * @return Filesystem|FilesystemAdapter
 	 */

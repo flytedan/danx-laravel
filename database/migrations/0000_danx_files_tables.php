@@ -20,13 +20,14 @@ return new class extends Migration {
 				$table->json('exif')->nullable();
 				$table->json('meta')->nullable();
 				$table->json('location')->nullable();
-				$table->uuid('storable_id')->nullable();
-				$table->string('storable_type', 255)->nullable();
 				$table->string('category', 255)->nullable();
+				$table->string('transcode_name')->nullable();
+				$table->uuid('original_stored_file_id')->nullable();
 				$table->timestamps();
 				$table->timestamp('deleted_at')->nullable();
 
 				$table->index(['storable_id', 'storable_type'], 'file_storable_index');
+				$table->foreign('original_stored_file_id')->references('id')->on('stored_files');
 			});
 		}
 	}

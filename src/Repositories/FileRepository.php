@@ -305,15 +305,11 @@ class FileRepository
 	{
 		$disk = $disk ?: config('filesystems.default');
 
-		$options += ['visibility' => 'public'];
-
 		if (!is_string($contents)) {
 			$contents = json_encode($contents);
 		}
 
-		$storageDisk = Storage::disk($disk);
-
-		$storageDisk->put($path, $contents, $options);
+		Storage::disk($disk)->put($path, $contents, $options);
 
 		return $this;
 	}
